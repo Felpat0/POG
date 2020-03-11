@@ -1,0 +1,8 @@
+all: helloworld.exe
+
+helloworld.exe : HelloWorld.o
+	g++ -Wall -g -std=c++11 HelloWorld.o -o helloworld.exe
+    
+HelloWorld.o : HelloWorld.cpp
+	g++ -Wall -c -g -std=c++11 HelloWorld.cpp -o HelloWorld.o
+
