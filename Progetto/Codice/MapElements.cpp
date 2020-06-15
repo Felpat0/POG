@@ -137,7 +137,7 @@ bool Game::linkRooms(){
 
 bool Game::createPath(Room& room1, Room& room2){
     //int startingDirection = (rand()%2);
-    int startingDirection = 1;
+    int startingDirection = 0;
     std::vector<std::unique_ptr<Room>>::iterator end = rooms.end();
     std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin();
     //check if there is a possible straight line
@@ -181,10 +181,10 @@ bool Game::createPath(Room& room1, Room& room2){
         if(straightY == 0){
             bool ok;
             do{
-                ok = true;
                 y = (room1.y + room1.h -2) - rand() % (room1.h -2);
                 std::vector<std::unique_ptr<Room>>::iterator end = rooms.end();
                 std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin();
+                ok = true;
                 for(it; it != end; it++){
                     if((y == (**it).y || y == (**it).y + (**it).h - 1)){
                         ok = false;
@@ -214,16 +214,18 @@ bool Game::createPath(Room& room1, Room& room2){
 
         //Horizontal writing
         bool ok = true;
-        for(k = startingPoint[1]; (k <= room2.x || k >= room2.x + room2.w -1) || !ok; k += inc){
+        for(k = startingPoint[1]; (k <= room2.x || k >= room2.x + room2.w -1); k += inc){
             if(m[y][k] == ' ')
                 m[y][k] = 'O';
             else if(m[y][k] == 'X')
                 m[y][k] = 'D';
-            
             //printBoard();
         }
-        if(k == startingPoint[1])
+        if(k == startingPoint[1]){
+            if(m[y][k] == ' ')
+                m[y][k] = 'O';
             k = startingPoint[1] - inc;
+        }
         //std::cout<<"\n\nfine\n\n";
 
 
@@ -238,11 +240,39 @@ bool Game::createPath(Room& room1, Room& room2){
             else if(k != startingPoint[1] - inc && m[y][k] == 'X')
                 m[y][k] = 'D';
             //printBoard();
-            k += inc;
+            int oldInc = inc;
             inc = -1;
             if(startingPoint[0] <= room2.y)
                 inc = 1;
-            x = k;
+            int wallsCounter = 0;
+            int c;
+            int t = 0;
+            do{
+                c = 0;
+                //std::cout<<std::endl;
+                do{
+                    //std::cout<<(m[k + t*oldInc][x + c*inc]);
+                    if(m[y + c*inc][k + t*oldInc] == 'X' || m[y + c*inc][k + t*oldInc] == 'D')
+                        wallsCounter ++;
+                    else
+                        wallsCounter = 0;
+                    if(wallsCounter > 1)
+                        break;
+                    c++;
+                }while((y + c*inc <= MAX_MATRIX_HEIGHT -1 && y + c*inc > -1) && (y + c*inc <= room2.y || y + c*inc >= room2.y + room2.h -1));
+                
+                //std::cout<<std::endl<<"Riga "<<k + t*oldInc<<"   Counter "<<wallsCounter<<"\n";
+                if(wallsCounter < 2)
+                    break;
+                t++;
+                wallsCounter = 0;
+            }while(true);
+
+            for(x = k; x != k + t*oldInc; x = x + t*oldInc){
+                if(m[y][x] == ' ')
+                    m[y][x] == 'O';
+            }
+            x = k + t*oldInc;
             //Vertical writing
             for(k = startingPoint[0]; (k <= room2.y || k >= room2.y + room2.h -1); k += inc){
                 if(m[k][x] == ' ')
