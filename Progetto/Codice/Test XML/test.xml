@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Game w="20" h="20" exitX="6" exitY="10" chExit="0x0057" chPath="0x0023">
+    <Rooms>
+            <Room label="Room1" x="0" y="0" w="20" h="20" chWall="0x2593" chFloor="0x00B7">
+                <Door room="Room1" x="0" y="0" locked="0" chUnlocked="0x004F" chLocked="0x00D8">
+                </Door>
+            </Room>
+    </Rooms>
+</Game>

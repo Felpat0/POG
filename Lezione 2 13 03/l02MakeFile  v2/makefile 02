@@ -1,0 +1,29 @@
+# in un makefile possiamo definire piu' di un target
+# e a destra dei due punti del target possiamo definire le dependencies di quel target
+# ovvero le cose necessarie per portare a compimento quel target
+# in questo modo possiamo controllare file o addirittura richiamare altri target, ad esempio
+all: exec
+
+# richiede i file main.o func1.o e func2.o, il comando seguente verra' eseguito solo dopo che questi file saranno pronti
+exec: main.o func1.o func2.o
+	g++ main.o func1.o func2.o -o test2
+
+# richiede il file main.cpp
+main.o: main.cpp 
+	g++ -c main.cpp
+# lo compila tramite il comando -c creando il file object .o
+
+func1.o: func1.cpp
+	g++ -c func1.cpp
+
+func2.o: func2.cpp
+	g++ -c func2.cpp
+
+clean:
+	del /s /q *.o test2
+# rimuove tutti i file .o e il file target2
+# la versione linux: (ci sono delle differenze ma non saranno trattate in questa lezione)
+# rm -rf *.o test2
+	
+# da terminale posso richiamare un target specifico con la sintassi
+# make nomeTarget

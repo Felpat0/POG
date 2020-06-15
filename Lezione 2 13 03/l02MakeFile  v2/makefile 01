@@ -1,0 +1,13 @@
+# nei makefile possiamo specificare dei target
+# un target rappresenta un'azione da far eseguire al makefile
+# e la sintassi per definire un target e' semplicemente 
+# targetName:
+# ad esempio spesso si usa un target di nome all
+all: 
+	g++ main.cpp func1.cpp func2.cpp -o test1
+# le istruzioni da far eseguire al main devono venire nella riga dopo il target
+# e devono essere distanziate dall'inizio della riga con di un tab
+# nello specifio questa istruzione comprende
+# g++			il comando per compilare (e linkare, se si elencano piu' file)
+# 				l'elenco dei files
+# -o filename	il comando per specificare il file di output

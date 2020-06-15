@@ -1,0 +1,10 @@
+
+
+
+				[ Personaggio ] <-- astratta
+						|
+		 _______________|_______________
+		/				|				\
+	Mago			Guerriero			Ladro
+	 |									  |
+Elementalista						  Assassino

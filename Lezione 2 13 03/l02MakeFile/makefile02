@@ -1,0 +1,14 @@
+CC = g++
+DEBUG = -g -std=c++11
+CFLAGS = -Wall -c $(DEBUG)
+LFLAGS = -Wall $(DEBUG)
+OBJS = HelloWorld.o
+
+all: helloworld
+
+helloworld : $(OBJS)
+	$(CC) $(LFLAGS) $(OBJS) -o helloworld
+
+HelloWorld.o : HelloWorld.cpp
+	$(CC) $(CFLAGS) HelloWorld.cpp -o HelloWorld.o
+

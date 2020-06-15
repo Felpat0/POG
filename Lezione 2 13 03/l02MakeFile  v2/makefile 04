@@ -1,0 +1,24 @@
+CC = g++
+DEBUG = -g -std=c++11
+CFLAGS = -Wall -c $(DEBUG)
+LFLAGS = -Wall $(DEBUG)
+
+all: exec
+
+# possiamo anche compilare i file .o in una sottocartella, per tenere piu' pulito il progetto
+exec: obj/main.o obj/func1.o obj/func2.o
+	$(CC) $(LFLAGS) obj/main.o obj/func1.o obj/func2.o -o test2
+
+
+# ovviamente dovremo specificare la cartella dappertutto 
+obj/main.o: main.cpp 
+	$(CC) $(CFLAGS) main.cpp -o obj/main.o
+
+obj/func1.o: func1.cpp
+	$(CC) $(CFLAGS) func1.cpp -o obj/func1.o
+
+obj/func2.o: func2.cpp
+	$(CC) $(CFLAGS) func2.cpp -o obj/func2.o
+
+clean:
+	del /s /q *.o test2

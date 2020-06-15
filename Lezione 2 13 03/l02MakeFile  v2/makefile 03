@@ -1,0 +1,24 @@
+# in un makefile possiamo definire anche delle variabili da usare nei target e nei comandi
+CC = g++
+DEBUG = -g -std=c++11
+CFLAGS = -Wall -c $(DEBUG)
+LFLAGS = -Wall $(DEBUG)
+
+all: exec
+
+# per richiamare le variabili si usa la sintassi $(nomeVariabile)
+exec: main.o func1.o func2.o
+	$(CC) $(LFLAGS) main.o func1.o func2.o -o test2
+
+
+main.o: main.cpp 
+	$(CC) $(CFLAGS) main.cpp
+
+func1.o: func1.cpp
+	$(CC) $(CFLAGS) func1.cpp
+
+func2.o: func2.cpp
+	$(CC) $(CFLAGS) func2.cpp
+
+clean:
+	del /s /q *.o test2

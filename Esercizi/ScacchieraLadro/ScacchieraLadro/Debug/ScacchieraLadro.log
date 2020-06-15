@@ -1,0 +1,3 @@
+﻿  ScacchieraLadro.cpp
+D:\Università\POG\Esercizi\ScacchieraLadro\ScacchieraLadro\ScacchieraLadro.cpp(310,12): warning C4244: 'argomento': conversione da 'time_t' a 'unsigned int'. Possibile perdita di dati.
+  ScacchieraLadro.vcxproj -> D:\Università\POG\Esercizi\ScacchieraLadro\ScacchieraLadro\Debug\ScacchieraLadro.exe

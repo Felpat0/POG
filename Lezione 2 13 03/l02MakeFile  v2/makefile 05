@@ -1,0 +1,23 @@
+CC = g++
+DEBUG = -g -std=c++11
+CFLAGS = -Wall -c $(DEBUG)
+LFLAGS = -Wall $(DEBUG)
+# possiamo rendere piu' generica la cartella sfruttando una variabile
+ODIR = obj/
+
+all: exec
+
+exec: $(ODIR)main.o $(ODIR)func1.o $(ODIR)func2.o
+	$(CC) $(LFLAGS) $(ODIR)main.o $(ODIR)func1.o $(ODIR)func2.o -o test2
+
+$(ODIR)main.o: main.cpp functions.h
+	$(CC) $(CFLAGS) main.cpp -o $(ODIR)main.o
+
+$(ODIR)func1.o: func1.cpp functions.h
+	$(CC) $(CFLAGS) func1.cpp -o $(ODIR)func1.o
+
+$(ODIR)func2.o: func2.cpp functions.h
+	$(CC) $(CFLAGS) func2.cpp -o $(ODIR)func2.o
+
+clean:
+	del /s /q *.o test2

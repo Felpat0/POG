@@ -1,0 +1,5 @@
+<?xml versione="1.0" encoding="utf-8"?>
+<Root attrName="attrValue">
+	<Child childAttrName="childAttrValue">La stringa dentro il nodo!</Child>
+</Root>
+

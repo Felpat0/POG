@@ -1,0 +1,6 @@
+﻿  Es8.cpp
+D:\Università\POG\Esercizi\Esercizi 8-18\Es8\Es8\Es8.cpp(80,13): warning C4200: utilizzata estensione non standard: matrice di dimensioni zero in struct/union
+D:\Università\POG\Esercizi\Esercizi 8-18\Es8\Es8\Es8.cpp(80,13): message : Questo membro verrà ignorato da un costruttore o un operatore di assegnazione di copia/spostamento impostato come predefinito
+D:\Università\POG\Esercizi\Esercizi 8-18\Es8\Es8\Es8.cpp(85,13): warning C4244: 'argomento': conversione da 'time_t' a 'unsigned int'. Possibile perdita di dati.
+D:\Università\POG\Esercizi\Esercizi 8-18\Es8\Es8\Es8.cpp(112,1): warning C4154: eliminazione di un'espressione di matrice. Fornita conversione a puntatore
+  Es8.vcxproj -> D:\Università\POG\Esercizi\Esercizi 8-18\Es8\Es8\Debug\Es8.exe
