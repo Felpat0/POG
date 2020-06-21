@@ -2,22 +2,57 @@
 //GAME SECTION
 //Game constructor
 Game::Game(){
+    lapsedTime = 0;
+    //Init matrix
     for (int i = 0; i != MAX_MATRIX_HEIGHT -1; i++) {
 		for (int j = 0; j != MAX_MATRIX_WIDTH -1; j++) {
             m[i][j] = ' ';
 		}
 	}
+
 }
 
+//Game destructor
+/*Game::~Game(){
+    delete player;
+}
+*/
 
 //Game functions
 void Game::printBoard(){
     for (int i = 0; i != MAX_MATRIX_HEIGHT -1; i++) {
 		for (int j = 0; j != MAX_MATRIX_WIDTH -1; j++) {
-            std::cout<<m[i][j];
+            if(player->y == i && player->x == j)
+                std::cout<<'P';
+            else{
+                std::vector<std::unique_ptr<Enemy>>::iterator end = enemies.end();
+                bool written = false;
+                for (std::vector<std::unique_ptr<Enemy>>::iterator it = enemies.begin(); it != end; it++ ){
+                    if((**it).y == i && (**it).x == j){
+                        written = true;
+                        printf("%c", static_cast<Goblin*>((*it).get())->ch);
+                    }
+                }
+                if(!written)
+                    std::cout<<m[i][j];
+            }
+                
 		}
 		std::cout << std::endl;
 	}
+}
+
+bool Game::isWalkable(int x, int y){
+    if(m[y][x] == 'X' || m[y][x] == ' ' || (y == player->y && x == player->x))
+        return false;
+    std::vector<std::unique_ptr<Enemy>>::iterator end = enemies.end();
+    bool written = false;
+    for (std::vector<std::unique_ptr<Enemy>>::iterator it = enemies.begin(); it != end; it++ ){
+        if((**it).x == x && (**it).y == y)
+            return false;
+    }
+    
+    return true;
 }
 
 void Game::addRoom(Room& room){
@@ -396,6 +431,65 @@ bool Game::createPath(Room& room1, Room& room2){
                 m[y][k - inc] = 'D';
         }
         //std::cout<<"\n\nFine 2\n\n";
+    }
+}
+
+bool Game::spawnPlayer(std::string playerClass){
+    //Spawn player
+    unsigned int tempRoomIndex = rand() % ROOMS_NUMBER;
+    unsigned int tempX = rooms[tempRoomIndex]->x + rooms[tempRoomIndex]->w -2 - rand() % (rooms[tempRoomIndex]->w -2);
+    unsigned int tempY = rooms[tempRoomIndex]->y + rooms[tempRoomIndex]->h -2 - rand() % (rooms[tempRoomIndex]->h -2);
+    if(playerClass == "Warrior" || playerClass == "warrior"){
+        player = new Warrior(tempX, tempY);
+        return true;
+    }
+}
+
+void Game::spawnEnemy(std::string enemyClass){
+    //Spawn goblin
+    unsigned int tempRoomIndex = rand() % ROOMS_NUMBER;
+    unsigned int tempX = rooms[tempRoomIndex]->x + rooms[tempRoomIndex]->w -2 - rand() % (rooms[tempRoomIndex]->w -2);
+    unsigned int tempY = rooms[tempRoomIndex]->y + rooms[tempRoomIndex]->h -2 - rand() % (rooms[tempRoomIndex]->h -2);
+    if(enemyClass == "Goblin" || enemyClass == "goblin"){
+        std::unique_ptr<Goblin> goblin;
+        goblin = std::unique_ptr<Goblin>(new Goblin(tempX, tempY));
+        enemies.push_back(std::move(goblin));
+    }
+
+}
+
+void Game::moveEnemies(){
+    int direction;
+    int tempX;
+    int tempY;
+    std::vector<std::unique_ptr<Enemy>>::iterator end = enemies.end();
+    for (std::vector<std::unique_ptr<Enemy>>::iterator it = enemies.begin(); it != end; it++ ){
+        if((**it).getNextActTime() <= lapsedTime){
+            do{
+                direction = 1 + (rand() % 4);
+                switch (direction)
+                {
+                case 1: //Up
+                    tempX = (**it).getX();
+                    tempY = (**it).getY() - 1;
+                    break;
+                case 2: //Down
+                    tempX = (**it).getX();
+                    tempY = (**it).getY() + 1;
+                    break;
+                case 3: //Left
+                    tempX = (**it).getX() - 1;
+                    tempY = (**it).getY();
+                    break;
+                case 4: //Right
+                    tempX = (**it).getX() + 1;
+                    tempY = (**it).getY();
+                    break;
+                }
+            }while(!isWalkable(tempX, tempY));
+            (**it).setCoordinates(tempX, tempY);
+            (**it).setNextActTime(this->lapsedTime + (**it).getMovTime());
+        }
     }
 }
 //------------------------------------------------------------------

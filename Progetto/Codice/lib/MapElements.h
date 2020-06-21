@@ -1,19 +1,7 @@
 #ifndef _ELEMENTS_H
 #define _ELEMENTS_H
-#include <iostream>
-#include <string>
-#include <cstdlib>
-#include <vector>
-#include <ctime>
-#include <memory>
+#include "Characters.h"
 
-
-#define MAX_ROOM_HEIGHT 9
-#define MAX_ROOM_WIDTH 9
-#define MAX_X_VALUE 20
-#define MAX_Y_VALUE 20
-#define MAX_MATRIX_WIDTH 30
-#define MAX_MATRIX_HEIGHT 30
 
 class Door{
     public:
@@ -52,18 +40,27 @@ class Game{
     int h;
     int exitX;
     int exitY;
+    float lapsedTime;
     char m[MAX_MATRIX_HEIGHT][MAX_MATRIX_WIDTH];
-    std::vector<std::unique_ptr<Room>> rooms;
 
+    std::vector<std::unique_ptr<Room>> rooms;
+    std::vector<std::unique_ptr<Enemy>> enemies;
+    Player* player;
     std::string chExit;
     std::string chPath;
 
     Game();
+    //~Game();
     void printBoard();
+    public: bool isWalkable(int x, int y);
     void addRoom(Room& room);
     void addRoom();
     int isColliding(Room& room1, Room& room2);
     bool createPath(Room& room1, Room& room2);
     bool linkRooms();
+
+    bool spawnPlayer(std::string playerClass);
+    void spawnEnemy(std::string enemyType);
+    void moveEnemies();
 };
 #endif
