@@ -1,0 +1,21 @@
+<enemies>
+    <enemy label="Goblin" ch="0x0047" >
+        <baseStats hpMax="6" str="4" dex="2" mnd="1" wis="1" res="0" movT="1.5" actT="2.5" />
+        <enemyStats atkStat="str" atkRange="1" sight="4" exp="20" gp="1" />
+    </enemy>
+
+    <enemy label="Lance Knight" ch="0x004C">
+        <baseStats hpMax="8" str="4" dex="2" mnd="2" wis="1" res="1" movT="1.5" actT="2.5" />
+        <enemyStats atkStat="str" atkRange="2" sight="5" exp="40" gp="5" />
+    </enemy>
+
+    <enemy label="Wolf" ch="0x0057">
+        <baseStats hpMax="8" str="4" dex="5" mnd="1" wis="1" res="0" movT="0.75" actT="1.5" />
+        <enemyStats atkStat="dex" atkRange="1" sight="8" exp="50" gp="0" />
+    </enemy>
+
+    <enemy label="Crossbow Goblin" ch="0x0043">
+        <baseStats hpMax="5" str="1" dex="5" mnd="1" wis="1" res="0" movT="1.5" actT="2.2" />
+        <enemyStats atkStat="dex" atkRange="5" sight="8" exp="35" gp="4" />
+    </enemy>
+</enemies>

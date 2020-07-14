@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<classes>
+    <heroClass label="Warrior">
+        <baseStats hpMax="20" mpMax="0" str="4" dex="2" mnd="1" wis="2" res="3" movT="1" actT="2" />
+        <levelUpStats hpMax="3" mpMax="0" str="1" dex="0.5" mnd="0.3" wis="0.3" res="0.8" movT="-0.05" actT="-0.05" />
+        <startingEquipment>
+            <weapon label="Longsword" />
+            <protection label="Leather Armor" />
+            <potion label="Healing Potion" />
+        </startingEquipment>
+    </heroClass>
+
+    <heroClass label="Wizard" >
+        <baseStats hpMax="16" mpMax="10" str="1" dex="3" mnd="2" wis="5" res="2" movT="1" actT="2" />
+        <levelUpStats hpMax="2" mpMax="2" str="0.3" dex="0.3" mnd="0.8" wis="1" res="0.5" movT="-0.05" actT="-0.05" />
+        <startingEquipment>
+            <weapon label="Dagger" />
+            <scroll label="Magic Missle" />
+            <potion label="Healing Potion" />
+        </startingEquipment>
+    </heroClass>
+
+    <heroClass label="Rogue" >
+        <baseStats hpMax="16" mpMax="0" str="2" dex="4" mnd="1" wis="2" res="2" movT="1" actT="2" />
+        <levelUpStats hpMax="2" mpMax="1" str="0.5" dex="1" mnd="0.3" wis="0.5" res="0.6" movT="-0.075" actT="-0.075" />
+        <startingEquipment>
+            <weapon label="Longsword" />
+            <protection label="Leather Armor" />
+            <potion label="Healing Potion" />
+        </startingEquipment>
+    </heroClass>
+</classes>

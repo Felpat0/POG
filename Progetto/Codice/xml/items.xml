@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items>
+    <protection label="Leather Armor" ch="0x00BF">
+        <effect stat="maxHp" value="5.0" />
+        <effect stat="res" value="2.0" />
+    </protection>
+
+
+    <potion label="Healing Potion" ch="0x00BF">
+        <effect stat="hp" value="10.0" />
+    </potion>
+
+    <potion label="Strength Potion" ch="0x00BF">
+        <effect stat="str" value="1.0" />
+    </potion>
+
+    <herb label="Poison Herbs" ch="0x00BF" >
+        <effect stat="hp" value="-2.0" />
+        <effect stat="maxHp" value="-2.0" />
+    </herb>
+
+    <weapon label="Longsword" range="0" durability="0"  ch="0x00BF">
+        <bonusStats>
+            <effect stat="str" value="2.0" />
+            <effect stat="dex" value="1.0" />
+        </bonusStats>
+        <areaOfEffect>
+            <square fd="1.0" rd="0.0" stat="str" pot="1.0" /> 
+        </areaOfEffect>
+    </weapon>
+</items>

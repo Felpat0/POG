@@ -14,4 +14,4 @@ Lib/InventoryElements.o: Lib/InventoryElements.cpp Lib/InventoryElements.h
 	g++ -c Lib/InventoryElements.cpp -o Lib/InventoryElements.o
 
 clean: 
-	rm *.o
+	del /S *.o
