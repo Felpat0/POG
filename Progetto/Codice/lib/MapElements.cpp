@@ -62,12 +62,12 @@ bool Room::addDoor(std::unique_ptr<Door>& door){
     return true;
 }
 
-int Room::getId() const{return id;}
+unsigned int Room::getId() const{return id;}
 std::string Room::getLabel() const{return label;}
-int Room::getX() const{return x;}
-int Room::getY() const{return y;}
-int Room::getWidth() const{return w;}
-int Room::getHeight() const{return h;}
+unsigned int Room::getX() const{return x;}
+unsigned int Room::getY() const{return y;}
+unsigned int Room::getWidth() const{return w;}
+unsigned int Room::getHeight() const{return h;}
 std::string Room::getChWall() const{return chWall;}
 std::string Room::getChFloor() const{return chFloor;}
 
@@ -94,6 +94,8 @@ Game::Game(){
 */
 
 //Game functions
+
+Player* Game::getPlayer() const{return this->player;}
 
 void Game::generateMap(){
     this->chExit = "0x0057";
@@ -144,7 +146,7 @@ void Game::initMap(){
             for(xml_node<> * doorNode = roomNode->first_node("Doors")->first_node("Door"); doorNode; doorNode = doorNode->next_sibling()){
                 if(std::string(doorNode->name()) == "Door"){
                     std::unique_ptr<Door> tempDoor = std::unique_ptr<Door>(new Door(atoi(doorNode->first_attribute("id")->value()), atoi(doorNode->first_attribute("x")->value()), atoi(doorNode->first_attribute("y")->value()), atoi(doorNode->first_attribute("connectedDoorId")->value()), atoi(doorNode->first_attribute("connectedRoomId")->value()), (bool)(atoi(doorNode->first_attribute("locked")->value())), doorNode->first_attribute("chOpen")->value(), doorNode->first_attribute("chLocked")->value()));
-                    m[tempDoor->getY()][tempDoor->getX()] = -1*(rooms.back()->id);
+                    m[tempDoor->getY()][tempDoor->getX()] = -1*(rooms.back()->getId());
                     rooms.back()->addDoor(tempDoor);
                 }
             }
@@ -175,7 +177,7 @@ void Game::initMap(){
                         }
                     }
                 }else{
-                    //It's not a weapon
+                    //It's an item
                     std::vector<InventoryElement>::iterator iEnd = inventoryItems.end();
                     for (std::vector<InventoryElement>::iterator iIt = inventoryItems.begin(); iIt != iEnd; iIt++){
                         if(areStringsEqual((*iIt).getLabel(), itemNode->first_attribute("label")->value())){
@@ -184,6 +186,17 @@ void Game::initMap(){
                             items.push_back(std::move(item));
                         }
                     }
+                }
+            }
+
+            //Add chests
+            //Check if the room has chests
+            if(roomNode->first_node("treasureChests") != nullptr){
+                for(xml_node<> * itemNode = roomNode->first_node("treasureChests")->first_node(); itemNode; itemNode = itemNode->next_sibling()){
+                    std::unique_ptr<InventoryElement> item;
+                    item = std::unique_ptr<InventoryElement>(new InventoryElement(atoi(itemNode->first_attribute("x")->value()), atoi(itemNode->first_attribute("y")->value()), itemNode->first_attribute("label")->value(), itemNode->first_attribute("type")->value(), "0x00A9"));
+                    item->setChest(true);
+                    items.push_back(std::move(item));
                 }
             }
         }
@@ -228,21 +241,21 @@ void Game::exportMap(){
         room = wdoc.allocate_node( node_element,  wdoc.allocate_string("Room") );
         roomsNode->append_node(room);
 
-        attr = wdoc.allocate_attribute("id", wdoc.allocate_string(to_string((**it).id).c_str()));
+        attr = wdoc.allocate_attribute("id", wdoc.allocate_string(to_string((**it).getId()).c_str()));
         room->append_attribute(attr);
-        attr = wdoc.allocate_attribute("label", wdoc.allocate_string((**it).label.c_str()));
+        attr = wdoc.allocate_attribute("label", wdoc.allocate_string((**it).getLabel().c_str()));
         room->append_attribute(attr);
-        attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string((**it).x).c_str()));
+        attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string((**it).getX()).c_str()));
         room->append_attribute(attr);
-        attr = wdoc.allocate_attribute("y", wdoc.allocate_string(wdoc.allocate_string(to_string((**it).y).c_str())));
+        attr = wdoc.allocate_attribute("y", wdoc.allocate_string(wdoc.allocate_string(to_string((**it).getY()).c_str())));
         room->append_attribute(attr);
-        attr = wdoc.allocate_attribute("width", wdoc.allocate_string(to_string((**it).w).c_str()));
+        attr = wdoc.allocate_attribute("width", wdoc.allocate_string(to_string((**it).getWidth()).c_str()));
         room->append_attribute(attr);
-        attr = wdoc.allocate_attribute("height", wdoc.allocate_string(to_string((**it).h).c_str()));
+        attr = wdoc.allocate_attribute("height", wdoc.allocate_string(to_string((**it).getHeight()).c_str()));
         room->append_attribute(attr);
-        attr = wdoc.allocate_attribute("chWall", wdoc.allocate_string((**it).chWall.c_str()));
+        attr = wdoc.allocate_attribute("chWall", wdoc.allocate_string((**it).getChWall().c_str()));
         room->append_attribute(attr);
-        attr = wdoc.allocate_attribute("chFloor", wdoc.allocate_string((**it).chFloor.c_str()));
+        attr = wdoc.allocate_attribute("chFloor", wdoc.allocate_string((**it).getChFloor().c_str()));
         room->append_attribute(attr);
 
         //Add doors
@@ -264,7 +277,7 @@ void Game::exportMap(){
             door->append_attribute(attr);
             attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string((**doorsIt).getY()).c_str()));
             door->append_attribute(attr);
-            attr = wdoc.allocate_attribute("room", wdoc.allocate_string((**it).label.c_str()));
+            attr = wdoc.allocate_attribute("room", wdoc.allocate_string((**it).getLabel().c_str()));
             door->append_attribute(attr);
             attr = wdoc.allocate_attribute("locked", wdoc.allocate_string(to_string(int((**doorsIt).isLocked())).c_str()));
             door->append_attribute(attr);
@@ -287,7 +300,7 @@ void Game::exportMap(){
             do{
                 tempX = rand()%((**it).getX() + (**it).getWidth() - (**it).getX() - 2) + (**it).getX() + 1;
                 tempY = rand()%((**it).getY() + (**it).getHeight() - (**it).getY() - 2) + (**it).getY() + 1;
-            }while(getElementType(tempY, tempX) != 2);
+            }while(!isWalkableForPlayer(tempX, tempY));
             
             xml_node<> *enemy;
             enemy = wdoc.allocate_node(node_element, wdoc.allocate_string("Enemy") );
@@ -309,15 +322,18 @@ void Game::exportMap(){
             do{
                 tempX = rand()%((**it).getX() + (**it).getWidth() - (**it).getX() - 2) + (**it).getX() + 1;
                 tempY = rand()%((**it).getY() + (**it).getHeight() - (**it).getY() - 2) + (**it).getY() + 1;
-            }while(getElementType(tempY, tempX) != 2);
+            }while(!isWalkableForPlayer(tempX, tempY));
+            m[tempY][tempX] = 3;
             xml_node<> *item;
             item = wdoc.allocate_node(node_element, wdoc.allocate_string("Loot") );
             attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string(tempX).c_str()));
             item->append_attribute(attr);
             attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string(tempY).c_str()));
             item->append_attribute(attr);
-            //Decide randomly if the items is a weapon or not
-            if(rand()%2 == 1){
+
+            //Decide randomly if the items is a weapon, an item, GP or a key
+            int random = rand()%3;
+            if(random == 0){
                 //It's a weapon
                 attr = wdoc.allocate_attribute("type", wdoc.allocate_string("weapon"));
                 item->append_attribute(attr);
@@ -325,15 +341,69 @@ void Game::exportMap(){
                 int itemIndex = rand() % inventoryWeapons.size();
                 attr = wdoc.allocate_attribute("label", wdoc.allocate_string(inventoryWeapons.at(itemIndex).getLabel().c_str()));
                 item->append_attribute(attr);
-            }else{
-                //It's not a weapon
+            }else if(random == 1){
+                //It's an item
+                //Decide randomly what item it is
                 int itemIndex = rand() % inventoryItems.size();
                 attr = wdoc.allocate_attribute("type", wdoc.allocate_string(inventoryItems.at(itemIndex).getType().c_str()));
                 item->append_attribute(attr);
                 attr = wdoc.allocate_attribute("label", wdoc.allocate_string(inventoryItems.at(itemIndex).getLabel().c_str()));
                 item->append_attribute(attr);
+            }else if(random == 2){
+                //It's GP
+                attr = wdoc.allocate_attribute("type", wdoc.allocate_string("gp"));
+                item->append_attribute(attr);
+                attr = wdoc.allocate_attribute("label", wdoc.allocate_string(to_string((rand()%MAX_GP_LOOT_NUMBER - MIN_GP_LOOT_NUMBER + 1) + MIN_GP_LOOT_NUMBER).c_str()));
+                item->append_attribute(attr);
+            }else if(random == 3){
+                //It's a key
+                attr = wdoc.allocate_attribute("type", wdoc.allocate_string("key"));
+                item->append_attribute(attr);
+                attr = wdoc.allocate_attribute("label", wdoc.allocate_string(to_string((rand()%MAX_KEYS_LOOT_NUMBER - MIN_KEYS_LOOT_NUMBER + 1) + MIN_KEYS_LOOT_NUMBER).c_str()));
+                item->append_attribute(attr);
             }
             loots->append_node(item);
+        }
+        //Generate and add chests
+        if(rand()%CHESTS_CHANCE == 0){
+            xml_node<> *chests = wdoc.allocate_node( node_element,  wdoc.allocate_string("treasureChests") );
+            room->append_node(chests);
+            random = (rand() % (MAX_CHESTS_NUMBER + 1 - MIN_CHESTS_NUMBER)) + MIN_CHESTS_NUMBER;
+            for(int i = 0; i != random; i++){
+                do{
+                    tempX = rand()%((**it).getX() + (**it).getWidth() - (**it).getX() - 2) + (**it).getX() + 1;
+                    tempY = rand()%((**it).getY() + (**it).getHeight() - (**it).getY() - 2) + (**it).getY() + 1;
+                }while(!isWalkableForPlayer(tempX, tempY));
+                m[tempY][tempX] = 3;
+
+                xml_node<> *chest;
+                chest = wdoc.allocate_node(node_element, wdoc.allocate_string("Chest") );
+                attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string(tempX).c_str()));
+                chest->append_attribute(attr);
+                attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string(tempY).c_str()));
+                chest->append_attribute(attr);
+                //Decide what will the chest contain
+                switch (rand() % 2)
+                {
+                case 0:
+                    //GP
+                    attr = wdoc.allocate_attribute("type", wdoc.allocate_string("gp"));
+                    chest->append_attribute(attr);
+                    attr = wdoc.allocate_attribute("label", wdoc.allocate_string(to_string((rand()%MAX_CHEST_GOLD - MIN_CHEST_GOLD + 1) + MIN_CHEST_GOLD).c_str()));
+                    chest->append_attribute(attr);
+                    break;
+                case 1:
+                    //Keys
+                    attr = wdoc.allocate_attribute("type", wdoc.allocate_string("key"));
+                    chest->append_attribute(attr);
+                    attr = wdoc.allocate_attribute("label", wdoc.allocate_string(to_string((rand()%MAX_CHEST_KEYS - MIN_CHEST_KEYS + 1) + MIN_CHEST_KEYS).c_str()));
+                    chest->append_attribute(attr);
+                    break;
+                default:
+                    break;
+                }
+                chests->append_node(chest);
+            }
         }
     }
     
@@ -380,7 +450,6 @@ void Game::printInterface(){
                     }
                     //Check if a weapon is in this position
                     std::vector<std::unique_ptr<Weapon>>::iterator end3 = weapons.end();
-
                     for (std::vector<std::unique_ptr<Weapon>>::iterator it = weapons.begin(); it != end3; it++){
                         if((**it).getY() == i && (**it).getX() == j){
                             written = true;
@@ -479,10 +548,15 @@ void Game::printInterface(){
                     break;
             default:
                 if(y >= 12 && y <= 21){
-                    std::cout<<y-12<<": ";
+                    std::cout<<y-12;
                     if(y-12 < player->getInventorySize()){
+                        if(player->getInventoryElementAt(y-12).getIsEquipped())
+                            std::cout<<" E : ";
+                        else
+                            std::cout<<"   : ";
                         std::cout<<player->getInventoryElementAt(y-12).getLabel();
-                    }
+                    }else
+                        std::cout<<"   : ";
                 }
                 break;
             }
@@ -544,16 +618,37 @@ bool Game::isWalkableForPlayer(int x, int y){
     return true;
 }
 
-int Game::getElementType(int i, int j) const{
+int Game::getElementType(int i, int j){
     //0 = nothing
     //1 = open door
     //2 = floor
     //3 = path
     //4 = wall
+    //5 = enemy
+    //6 = loot
+    //7 = chest
 
     if(m[i][j] == 0)
         return 0;
     else if(m[i][j] < -3){
+        //Check if enemy
+        std::vector<std::unique_ptr<Enemy>>::iterator enemiesEnd = enemies.end();
+        for (std::vector<std::unique_ptr<Enemy>>::iterator it = enemies.begin(); it != enemiesEnd;  it++ ){
+            if((**it).getX() == j && (**it).getY() == i)
+                return false;
+        }
+        //Check if loot
+        std::vector<std::unique_ptr<InventoryElement>>::iterator itemsEnd = items.end();
+        for (std::vector<std::unique_ptr<InventoryElement>>::iterator it = items.begin(); it != itemsEnd;  it++ ){
+            if((**it).getX() == j && (**it).getY() == i){
+                if((**it).getIsChest())
+                    return 7;
+                else
+                    return 6;
+            }
+        }
+        //Check if chest
+
         //Check if door
         std::vector<std::unique_ptr<Door>>::iterator end = rooms.at(abs(m[i][j])-4)->doors.end();
         for (std::vector<std::unique_ptr<Door>>::iterator it = rooms.at(abs(m[i][j])-4)->doors.begin(); it != end; it++ ){
@@ -561,8 +656,8 @@ int Game::getElementType(int i, int j) const{
                 return 1;
             }
         }
-        if(i >= rooms.at(abs(m[i][j]) - 4)->y && i <= rooms.at(abs(m[i][j]) - 4)->y + rooms.at(abs(m[i][j]) - 4)->h -1
-             && j >= rooms.at(abs(m[i][j]) - 4)->x && j <= rooms.at(abs(m[i][j]) - 4)->x + rooms.at(abs(m[i][j]) - 4)->w -1){
+        if(i >= rooms.at(abs(m[i][j]) - 4)->getY() && i <= rooms.at(abs(m[i][j]) - 4)->getY() + rooms.at(abs(m[i][j]) - 4)->getHeight() -1
+             && j >= rooms.at(abs(m[i][j]) - 4)->getX() && j <= rooms.at(abs(m[i][j]) - 4)->getX() + rooms.at(abs(m[i][j]) - 4)->getWidth() -1){
             //It's floor
             return 2;
         }else{
@@ -580,24 +675,24 @@ void Game::addRoom(std::unique_ptr<Room>& room){
     bool isCorner = false;
     std::vector<std::unique_ptr<Room>>::iterator end = rooms.end();
     //Write room
-    for(int i = (*room).y; i != (*room).y + (*room).h; i++){
-        for(int j = (*room).x; j != (*room).x + (*room).w; j++){
+    for(int i = room->getY(); i != room->getY() + room->getHeight(); i++){
+        for(int j = room->getX(); j != room->getX() + room->getWidth(); j++){
             isCorner = false;
             for (std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin(); it != end; it++ ){
-                if((i == (**it).y && j == (**it).x) || (i == (**it).y + (**it).h -1 && j == (**it).x) || (i == (**it).y && j == (**it).x + (**it).w -1) || (i == (**it).y + (**it).h -1 && j == (**it).x + (**it).w -1)){
+                if((i == (**it).getY() && j == (**it).getX()) || (i == (**it).getY() + (**it).getHeight() -1 && j == (**it).getX()) || (i == (**it).getY() && j == (**it).getX() + (**it).getWidth() -1) || (i == (**it).getY() + (**it).getHeight() -1 && j == (**it).getX() + (**it).getWidth() -1)){
                     isCorner = true;
                 }
             }
-            if((i == room->y && j == room->x) || (i == room->y + room->h -1 && j == room->x) || (i == room->y && j == room->x + room->w -1) || (i == room->y + room->h -1 && j == room->x + room->w -1)){
+            if((i == room->getY() && j == room->getX()) || (i == room->getY() + room->getHeight() -1 && j == room->getX()) || (i == room->getY() && j == room->getX() + room->getWidth() -1) || (i == room->getY() + room->getHeight() -1 && j == room->getX() + room->getWidth() -1)){
                 isCorner = true;
             }
-            if((j != (*room).x && i != (*room).y) && (j != (*room).x + (*room).w -1 && i != (*room).y + (*room).h -1))
-                m[i][j] = -1*room->id;
+            if((j != room->getX() && i != room->getY()) && (j != room->getX() + room->getWidth() -1 && i != room->getY() + room->getHeight() -1))
+                m[i][j] = -1*room->getId();
             else if((m[i][j] >= 4 || m[i][j] <= -4) && !isCorner){
-                m[i][j] = -1*room->id;
+                m[i][j] = -1*room->getId();
             }
             else
-                m[i][j] = room->id;
+                m[i][j] = room->getId();
         }
     }
     rooms.push_back(std::move(room));
@@ -618,24 +713,24 @@ void Game::addRoom(int id, std::string chWall, std::string chFloor){
     bool isCorner = false;
     std::vector<std::unique_ptr<Room>>::iterator end = rooms.end();
     //Write room
-    for(int i = (*room).y; i != (*room).y + (*room).h; i++){
-        for(int j = (*room).x; j != (*room).x + (*room).w; j++){
+    for(int i = room->getY(); i != room->getY() + room->getHeight(); i++){
+        for(int j = room->getX(); j != room->getX() + room->getWidth(); j++){
             isCorner = false;
             for (std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin(); it != end; it++ ){
-                if((i == (**it).y && j == (**it).x) || (i == (**it).y + (**it).h -1 && j == (**it).x) || (i == (**it).y && j == (**it).x + (**it).w -1) || (i == (**it).y + (**it).h -1 && j == (**it).x + (**it).w -1)){
+                if((i == (**it).getY() && j == (**it).getX()) || (i == (**it).getY() + (**it).getHeight() -1 && j == (**it).getX()) || (i == (**it).getY() && j == (**it).getX() + (**it).getWidth() -1) || (i == (**it).getY() + (**it).getHeight() -1 && j == (**it).getX() + (**it).getWidth() -1)){
                     isCorner = true;
                 }
             }
-            if((i == room->y && j == room->x) || (i == room->y + room->h -1 && j == room->x) || (i == room->y && j == room->x + room->w -1) || (i == room->y + room->h -1 && j == room->x + room->w -1)){
+            if((i == room->getY() && j == room->getX()) || (i == room->getY() + room->getHeight() -1 && j == room->getX()) || (i == room->getY() && j == room->getX() + room->getWidth() -1) || (i == room->getY() + room->getHeight() -1 && j == room->getX() + room->getWidth() -1)){
                 isCorner = true;
             }
-            if((j != (*room).x && i != (*room).y) && (j != (*room).x + (*room).w -1 && i != (*room).y + (*room).h -1))
-                m[i][j] = -1*room->id;
+            if((j != room->getX() && i != room->getY()) && (j != room->getX() + room->getWidth() -1 && i != room->getY() + room->getHeight() -1))
+                m[i][j] = -1*room->getId();
             else if((m[i][j] >= 4 || m[i][j] <= -4) && !isCorner){
-                m[i][j] = -1*room->id;
+                m[i][j] = -1*room->getId();
             }
             else
-                m[i][j] = room->id;
+                m[i][j] = room->getId();
         }
     }
     
@@ -644,27 +739,27 @@ void Game::addRoom(int id, std::string chWall, std::string chFloor){
 
 int Game::isColliding(Room& room1, Room& room2){
     int collision = 0;
-    if((room1.getX() < room2.x + room2.w - 2 && room1.getX() > room2.x + 2 || room1.getX() + room1.getWidth() < room2.x + room2.w - 2 && room1.getX() + room1.getWidth() > room2.x + 2) || (room2.x < room1.getX() + room1.getWidth() - 2 && room2.x > room1.getX() + 2 || room2.x + room2.w < room1.getX() + room1.getWidth() - 2 && room2.x + room2.w > room1.getX() + 2)){
+    if((room1.getX() < room2.getX() + room2.getWidth() - 2 && room1.getX() > room2.getX() + 2 || room1.getX() + room1.getWidth() < room2.getX() + room2.getWidth() - 2 && room1.getX() + room1.getWidth() > room2.getX() + 2) || (room2.getX() < room1.getX() + room1.getWidth() - 2 && room2.getX() > room1.getX() + 2 || room2.getX() + room2.getWidth() < room1.getX() + room1.getWidth() - 2 && room2.getX() + room2.getWidth() > room1.getX() + 2)){
 		//Room1's upper wall colliding
-        if(room1.y == room2.y + room2.h - 1){
+        if(room1.getY() == room2.getY() + room2.getHeight() - 1){
             collision = 2;
         }
         //Room1's lower wall colliding
-        if(room1.y + room1.h -1 == room2.y){
+        if(room1.getY() + room1.getHeight() -1 == room2.getY()){
             collision = 3;
         }
 	}
 
-    if((room1.y < room2.y + room2.h - 2 && room1.y > room2.y + 2 || room1.y + room1.h < room2.y + room2.h - 2 && room1.y + room1.h > room2.y + 2) || (room2.y < room1.y + room1.h -2 && room2.y > room1.y + 2 || room2.y + room2.h < room1.y + room1.h - 2 && room2.y + room2.h > room1.y + 2)){
+    if((room1.getY() < room2.getY() + room2.getHeight() - 2 && room1.getY() > room2.getY() + 2 || room1.getY() + room1.getHeight() < room2.getY() + room2.getHeight() - 2 && room1.getY() + room1.getHeight() > room2.getY() + 2) || (room2.getY() < room1.getY() + room1.getHeight() -2 && room2.getY() > room1.getY() + 2 || room2.getY() + room2.getHeight() < room1.getY() + room1.getHeight() - 2 && room2.getY() + room2.getHeight() > room1.getY() + 2)){
         //Room1's left wall colliding
-        if(room1.getX() == room2.x + room2.w - 1){
+        if(room1.getX() == room2.getX() + room2.getWidth() - 1){
             if(collision == 0)
                 collision = 4;
             else
                 collision = 1;
         }
         //Room1's right wall colliding
-        if(room1.getX() + room1.getWidth() - 1 == room2.x){
+        if(room1.getX() + room1.getWidth() - 1 == room2.getX()){
             if(collision == 0)
                 collision = 5;
             else
@@ -672,9 +767,9 @@ int Game::isColliding(Room& room1, Room& room2){
         }
 	}
     if(collision == 0){
-        if((room1.getX() <= room2.x + room2.w && room1.getX() >= room2.x || room1.getX() + room1.getWidth() <= room2.x + room2.w && room1.getX() + room1.getWidth() >= room2.x) || (room2.x <= room1.getX() + room1.getWidth() && room2.x >= room1.getX() || room2.x + room2.w <= room1.getX() + room1.getWidth() && room2.x + room2.w >= room1.getX())){
+        if((room1.getX() <= room2.getX() + room2.getWidth() && room1.getX() >= room2.getX() || room1.getX() + room1.getWidth() <= room2.getX() + room2.getWidth() && room1.getX() + room1.getWidth() >= room2.getX()) || (room2.getX() <= room1.getX() + room1.getWidth() && room2.getX() >= room1.getX() || room2.getX() + room2.getWidth() <= room1.getX() + room1.getWidth() && room2.getX() + room2.getWidth() >= room1.getX())){
                 //Then if y coordinates match
-                if((room1.y <= room2.y + room2.h && room1.y >= room2.y || room1.y + room1.h <= room2.y + room2.h && room1.y + room1.h >= room2.y) || (room2.y <= room1.y + room1.h && room2.y >= room1.y || room2.y + room2.h <= room1.y + room1.h && room2.y + room2.h >= room1.y)){
+                if((room1.getY() <= room2.getY() + room2.getHeight() && room1.getY() >= room2.getY() || room1.getY() + room1.getHeight() <= room2.getY() + room2.getHeight() && room1.getY() + room1.getHeight() >= room2.getY()) || (room2.getY() <= room1.getY() + room1.getHeight() && room2.getY() >= room1.getY() || room2.getY() + room2.getHeight() <= room1.getY() + room1.getHeight() && room2.getY() + room2.getHeight() >= room1.getY())){
                     collision = 1;
                 }
         }
@@ -726,7 +821,7 @@ bool Game::linkRoomsByDoors(){
                 //Iterate over every door of the connected room to check if it is the right one
                 for (it3; it3 != end3; it3++){
                     if((**it3).getId() == (**it2).getConnectedDoorId()){ 
-                        createPathByDoors(**it2, **it3, (**it).id); 
+                        createPathByDoors(**it2, **it3, (**it).getId()); 
                         break;
                     }
                 }
@@ -758,7 +853,7 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
         //Iterate over rooms to do a check
         for(it = rooms.begin(); it != end; it++){
             //Check if the path would go on a wall
-            if(x == (**it).x || x == (**it).x + (**it).w - 1){
+            if(x == (**it).getX() || x == (**it).getX() + (**it).getWidth() - 1){
                 ok = false;
                 break;
             }
@@ -766,16 +861,16 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
         if(ok){
             //Check if between this possibile door and room2 the would be another door
             //Find the Y coordinate
-            if(room1.y > room2.y + room2.h - 1){
+            if(room1.getY() > room2.getY() + room2.getHeight() - 1){
                 //Room 1 is under room2
-                y = room1.y;
+                y = room1.getY();
                 inc = -1;
-                cycleEnd = room2.y + room2.h - 1;
-            }else if(room1.y + room1.h - 1 < room2.y){
+                cycleEnd = room2.getY() + room2.getHeight() - 1;
+            }else if(room1.getY() + room1.getHeight() - 1 < room2.getY()){
                 //Room 1 is over room2
-                y = room1.y + room1.h - 1;
+                y = room1.getY() + room1.getHeight() - 1;
                 inc = 1;
-                cycleEnd = room2.y;
+                cycleEnd = room2.getY();
             }else{
                 ok = false;
             }
@@ -792,7 +887,7 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
             }
         }
         y = oldY;
-        if(x > room2.x && x < room2.x + room2.w -1 && ok){
+        if(x > room2.getX() && x < room2.getX() + room2.getWidth() -1 && ok){
             straightX = x;
             //std::cout<<"VERTICAL STRAIGHT\n\n";
             //Write the path
@@ -810,19 +905,19 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                     m[y][straightX] = m[y][straightX]*-1;
                     previousRoomId = abs(m[y][straightX]) - 4;
                 }else if(getElementType(y, straightX) == 0)
-                    m[y][straightX] = room1.id*-1;
+                    m[y][straightX] = room1.getId()*-1;
             }
             break;
         }
     }
     //check if horizontal straight
     if(straightX == 0){
-        for(y = room1.y + 1; y != room1.y + room1.h -1; y ++){
+        for(y = room1.getY() + 1; y != room1.getY() + room1.getHeight() -1; y ++){
             bool ok = true;
             std::vector<std::unique_ptr<Room>>::iterator end = rooms.end();
             std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin();
             for(it = rooms.begin(); it != end; it++){
-                if(y == (**it).y || y == (**it).y + (**it).h - 1){
+                if(y == (**it).getY() || y == (**it).getY() + (**it).getHeight() - 1){
                     ok = false;
                     break;
                 }
@@ -830,16 +925,16 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
             if(ok){
                 //Check if between this possibile door and room2 the would be another door
                 //Find the X coordinate
-                if(room1.getX() > room2.x + room2.w - 1){
+                if(room1.getX() > room2.getX() + room2.getWidth() - 1){
                     //Room 1 is under room2
                     x = room1.getX();
                     inc = -1;
-                    cycleEnd = room2.x + room2.w - 1;
-                }else if(room1.getX() + room1.getWidth() -1 < room2.x){
+                    cycleEnd = room2.getX() + room2.getWidth() - 1;
+                }else if(room1.getX() + room1.getWidth() -1 < room2.getX()){
                     //Room 1 is over room2
                     x = room1.getX() + room1.getWidth() - 1;
                     inc = 1;
-                    cycleEnd = room2.x; 
+                    cycleEnd = room2.getX(); 
                 }else{
                     ok = false;
                 }
@@ -856,7 +951,7 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                 }
             }
             x = oldX;
-            if(y > room2.y && y < room2.y + room2.h -1 && ok){
+            if(y > room2.getY() && y < room2.getY() + room2.getHeight() -1 && ok){
                 straightY = y;
                 //std::cout<<"HORIZONTAL STRAIGHT\n\n";
                 //If there is already a door, change path
@@ -882,7 +977,7 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                         m[straightY][x] = m[straightY][x] * -1;
                         previousRoomId = abs(m[straightY][x]) - 4;
                     }else if(getElementType(straightY, x) == 0)
-                        m[straightY][x] = room1.id*-1;
+                        m[straightY][x] = room1.getId()*-1;
                 }
                 break;
             }
@@ -894,29 +989,29 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
         int x = room1.getX() - 1;
         int inc = 1;
         
-        if(room2.x + (room2.w/2) > room1.getX() + (room1.getWidth()/2)){
+        if(room2.getX() + (room2.getWidth()/2) > room1.getX() + (room1.getWidth()/2)){
             x += room1.getWidth() + 1;
         }
         
         //Decide increment direction based on initial wall
-        if(x <= room2.x)
+        if(x <= room2.getX())
             inc = 1;
-        else if(x >= room2.x + room2.w -1)
+        else if(x >= room2.getX() + room2.getWidth() -1)
             inc = -1;
         bool ok;
         do{
-            y = (room1.y + room1.h -2) - rand() % (room1.h -2);
+            y = (room1.getY() + room1.getHeight() -2) - rand() % (room1.getHeight() -2);
             std::vector<std::unique_ptr<Room>>::iterator end = rooms.end();
             std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin();
             ok = true;
             for(it; it != end; it++){
-                if((y == (**it).y || y == (**it).y + (**it).h - 1)){
+                if((y == (**it).getY() || y == (**it).getY() + (**it).getHeight() - 1)){
                     ok = false;
                 }
             }
 
             //Check if the path woul go on a door
-            for(int k = x; (k <= room2.x || k >= room2.x + room2.w -1); k += inc){
+            for(int k = x; (k <= room2.getX() || k >= room2.getX() + room2.getWidth() -1); k += inc){
                 if(getElementType(y, k) == 1){
                     ok = false;
                     break;
@@ -929,25 +1024,25 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
         doorsCounter ++;
         doors ++;
         if(x == room1.getX() - 1){
-            m[y][x + 1] = room1.id * -1; //Door
+            m[y][x + 1] = room1.getId() * -1; //Door
             bool locked = rand()%2;
             std::unique_ptr<Door> tempDoor = std::unique_ptr<Door>(new Door(doorsCounter, x + 1, y, locked, "0x004F", "0x00D8"));
             room1.addDoor(tempDoor);
-            previousRoomId = room1.id - 4;
+            previousRoomId = room1.getId() - 4;
         }else{
-            m[y][x - 1] = room1.id * -1; //Door
+            m[y][x - 1] = room1.getId() * -1; //Door
             bool locked = rand()%2;
             std::unique_ptr<Door> tempDoor = std::unique_ptr<Door>(new Door(doorsCounter, x - 1, y, locked, "0x004F", "0x00D8"));
             room1.addDoor(tempDoor);
-            previousRoomId = room1.id - 4;
+            previousRoomId = room1.getId() - 4;
         }
         int k;
 
         //Horizontal writing
         ok = true;
-        for(k = startingPoint[1]; (k <= room2.x || k >= room2.x + room2.w -1); k += inc){
+        for(k = startingPoint[1]; (k <= room2.getX() || k >= room2.getX() + room2.getWidth() -1); k += inc){
             if(m[y][k] == 0)
-                m[y][k] = room1.id * -1; //Path
+                m[y][k] = room1.getId() * -1; //Path
             else if(getElementType(y, k) == 4){
                 doorsCounter ++;
                 doors ++;
@@ -967,17 +1062,17 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
         }
         if(k == startingPoint[1]){
             if(m[y][k] == 0)
-                m[y][k] = rooms.at(previousRoomId)->id * -1; //Path
+                m[y][k] = rooms.at(previousRoomId)->getId() * -1; //Path
             k = startingPoint[1] - inc;
         }
         //std::cout<<"\n\nfine\n\n";
 
 
         //Vertical
-            m[y][k] = rooms.at(previousRoomId)->id * -1; //Path
+            m[y][k] = rooms.at(previousRoomId)->getId() * -1; //Path
             int oldInc = inc;
             inc = -1;
-            if(startingPoint[0] <= room2.y)
+            if(startingPoint[0] <= room2.getY())
                 inc = 1;
             int wallsCounter = 0;
             int c;
@@ -995,7 +1090,7 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                     if(wallsCounter > 1)
                         break;
                     c++;
-                }while((y + c*inc <= MAX_MATRIX_HEIGHT -1 && y + c*inc > -1) && (y + c*inc <= room2.y || y + c*inc >= room2.y + room2.h -1));
+                }while((y + c*inc <= MAX_MATRIX_HEIGHT -1 && y + c*inc > -1) && (y + c*inc <= room2.getY() || y + c*inc >= room2.getY() + room2.getHeight() -1));
                     
                 //std::cout<<std::endl<<"Riga "<<k + t*oldInc<<"   Counter "<<wallsCounter<<"\n";
                 if(wallsCounter < 2)
@@ -1007,9 +1102,9 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
             x = k + t*oldInc;
 
             //Vertical writing
-            for(k = startingPoint[0]; (k <= room2.y || k >= room2.y + room2.h -1); k += inc){
+            for(k = startingPoint[0]; (k <= room2.getY() || k >= room2.getY() + room2.getHeight() -1); k += inc){
                 if(m[k][x] == 0)
-                    m[k][x] = rooms.at(previousRoomId)->id * -1; //Path
+                    m[k][x] = rooms.at(previousRoomId)->getId() * -1; //Path
                 else if(getElementType(k, x) == 4){
                     doorsCounter ++;
                     bool locked = rand()%2;
@@ -1022,7 +1117,7 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                         //std::cout<<"\n"<<previousRoomId<<"  "<<abs(m[k][x]) - 4;
                     }
                     previousRoomId = abs(m[k][x]) - 4;
-                    m[k][x] = rooms.at(previousRoomId)->id * -1; //Door
+                    m[k][x] = rooms.at(previousRoomId)->getId() * -1; //Door
                 }
             }
         
@@ -1131,8 +1226,8 @@ void Game::chooseClass(){
             unsigned int tempY;
             do{
                 unsigned int tempRoomIndex = rand() % ROOMS_NUMBER;
-                tempX = rooms[tempRoomIndex]->x + rooms[tempRoomIndex]->w -2 - rand() % (rooms[tempRoomIndex]->w -2);
-                tempY = rooms[tempRoomIndex]->y + rooms[tempRoomIndex]->h -2 - rand() % (rooms[tempRoomIndex]->h -2);
+                tempX = rooms[tempRoomIndex]->getX() + rooms[tempRoomIndex]->getWidth() -2 - rand() % (rooms[tempRoomIndex]->getWidth() -2);
+                tempY = rooms[tempRoomIndex]->getY() + rooms[tempRoomIndex]->getHeight() -2 - rand() % (rooms[tempRoomIndex]->getHeight() -2);
             }while(!isWalkableForPlayer(tempX, tempY));
             player = new Player(name, tempX, tempY, atoi(classNode->first_node("baseStats")->first_attribute("mpMax")->value()), 
             atoi(classNode->first_node("baseStats")->first_attribute("hpMax")->value()), stof(classNode->first_node("baseStats")->first_attribute("str")->value()), 
@@ -1280,13 +1375,34 @@ void Game::getItems(){
             inventoryWeapons.push_back(Weapon(0, 0, itemNode->first_attribute("label")->value(), itemNode->name(), itemNode->first_attribute("ch")->value(), atoi(itemNode->first_attribute("durability")->value()), atoi(itemNode->first_attribute("range")->value())));
             //Add effects to the weapon
             xml_node<> * tempNode = itemNode->first_node("bonusStats");
-            for (xml_node<> * effectNode = tempNode->first_node("effect"); effectNode; effectNode = effectNode->next_sibling()){
-                inventoryWeapons.back().addEffect(Effect(effectNode->first_attribute("stat")->value(), stof(effectNode->first_attribute("value")->value())));
+            if(tempNode != nullptr){
+                for (xml_node<> * effectNode = tempNode->first_node("effect"); effectNode; effectNode = effectNode->next_sibling()){
+                    inventoryWeapons.back().addEffect(Effect(effectNode->first_attribute("stat")->value(), stof(effectNode->first_attribute("value")->value())));
+                }
             }
             //AreasOfEffect to the weapon
             tempNode = itemNode->first_node("areaOfEffect");
-            for (xml_node<> * effectNode = tempNode->first_node("square"); effectNode; effectNode = effectNode->next_sibling()){
-                inventoryWeapons.back().addAreasOfEffect(Square(atoi(effectNode->first_attribute("fd")->value()), atoi(effectNode->first_attribute("rd")->value()), effectNode->first_attribute("stat")->value(), stof(effectNode->first_attribute("pot")->value())));
+            if(tempNode != nullptr){
+                for (xml_node<> * effectNode = tempNode->first_node("square"); effectNode; effectNode = effectNode->next_sibling()){
+                    inventoryWeapons.back().addAreasOfEffect(Square(atoi(effectNode->first_attribute("fd")->value()), atoi(effectNode->first_attribute("rd")->value()), effectNode->first_attribute("stat")->value(), stof(effectNode->first_attribute("pot")->value())));
+                }
+            }
+        }else if(areStringsEqual(itemNode->name(), "scroll")){
+            //It's a scroll
+            inventoryScrolls.push_back(Scroll(0, 0, itemNode->first_attribute("label")->value(), itemNode->name(), itemNode->first_attribute("ch")->value(), atoi(itemNode->first_attribute("range")->value()), stof(itemNode->first_attribute("mpCost")->value())));
+            //Add self effects to the scroll
+            xml_node<> * tempNode = itemNode->first_node("selfEffects");
+            if(tempNode != nullptr){
+                for (xml_node<> * effectNode = tempNode->first_node("effect"); effectNode; effectNode = effectNode->next_sibling()){
+                    inventoryScrolls.back().addSelfEffect(SelfEffect(effectNode->first_attribute("stat")->value(), stof(effectNode->first_attribute("pot")->value()), effectNode->first_attribute("potStat")->value()));
+                }
+            }
+            //Add AreasOfEffect to the scroll
+            tempNode = itemNode->first_node("areaOfEffect");
+            if(tempNode != nullptr){
+                for (xml_node<> * effectNode = tempNode->first_node("square"); effectNode; effectNode = effectNode->next_sibling()){
+                    inventoryScrolls.back().addAreasOfEffect(Square(atoi(effectNode->first_attribute("fd")->value()), atoi(effectNode->first_attribute("rd")->value()), effectNode->first_attribute("stat")->value(), stof(effectNode->first_attribute("pot")->value())));
+                }
             }
         }else{
             //It's a generic item
@@ -1430,15 +1546,4 @@ void Game::printUnicode(std::string character) const{
     }
 }
 
-bool Game::areStringsEqual(std::string a, std::string b){
-    if(a.length() != b.length())
-        return false;
-    else{
-        for(int i = 0; i != a.length(); i++){
-            if(toupper(a[i]) != toupper(b[i])){
-                return false;
-            }
-        }
-    }
-    return true;
-}
+

@@ -28,4 +28,41 @@
             <square fd="1.0" rd="0.0" stat="str" pot="1.0" /> 
         </areaOfEffect>
     </weapon>
+
+    <scroll label="Magic Missle" mpCost="1.0" range="20" ch="0x00FE" >
+        <areaOfEffect>
+            <square fd="0.0" rd="0.0" stat="mnd" pot="0.8" /> 
+        </areaOfEffect>
+    </scroll>
+
+    <scroll label="Healing Word" mpCost="1.0" range="0"  ch="0x00FE" >
+        <selfEffects>
+            <effect stat="hp" pot="2.0" potStat="wis" />
+        </selfEffects>
+    </scroll>
+
+    <scroll label="Guiding Light" mpCost="3.0" range="20" ch="0x00FE" >
+        <selfEffects>
+            <effect stat="hp" pot="2.0" potStat="wis" />
+        </selfEffects>
+        <areaOfEffect>
+            <square fd="0.0" rd="0.0" stat="mnd" pot="1.2" /> 
+        </areaOfEffect>
+    </scroll>
+
+    <scroll label="Aura Burn" mpCost="2.0" range="0"  ch="0x00FE" >
+        <areaOfEffect>
+            <square fd="-1.0" rd="-1.0" stat="mnd" pot="0.6" /> 
+            <square fd="0.0" rd="-1.0" stat="mnd" pot="0.6" /> 
+            <square fd="1.0" rd="-1.0" stat="mnd" pot="0.6" /> 
+            <square fd="-1.0" rd="0.0" stat="mnd" pot="0.6" /> 
+            <square fd="0.0" rd="0.0" stat="mnd" pot="0.6" /> 
+            <square fd="1.0" rd="0.0" stat="mnd" pot="0.6" /> 
+            <square fd="-1.0" rd="0.0" stat="mnd" pot="0.6" /> 
+            <square fd="1.0" rd="0.0" stat="mnd" pot="0.6" /> 
+            <square fd="-1.0" rd="1.0" stat="mnd" pot="0.6" /> 
+            <square fd="0.0" rd="1.0" stat="mnd" pot="0.6" /> 
+            <square fd="1.0" rd="1.0" stat="mnd" pot="0.6" /> 
+        </areaOfEffect>
+    </scroll>
 </items>

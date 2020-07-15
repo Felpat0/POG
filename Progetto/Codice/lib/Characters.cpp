@@ -23,6 +23,8 @@ Character::Character(unsigned int x, unsigned int y, unsigned int maxHP, float s
 
 int Character::getMovementIntention() const {return this->movementIntention;}
 void Character::resetMovementIntention(){this->movementIntention = 0;}
+
+std::string Character::getLabel() const {return this->label;}
 void Character::setCoordinates(const int x, const int y){
     this->x = x;
     this->y = y;
@@ -39,6 +41,25 @@ float Character::getRes() const{return this->res;}
 float Character::getMovTime() const{return this->movTime;}
 float Character::getActTime() const{return this->actTime;}
 std::string Character::getCh() const{return this->ch;}
+
+bool Character::takeDamage(std::string attackerLabel, unsigned int damage){ //False = character died
+    std::cout<<"\n"<<attackerLabel<<" attacked "<<this->label<<" for "<<damage<<" damage.";
+    if(damage -res >= this->hp){
+        this->hp = 0;
+        std::cout<<"\n"<<this->label<<" has been defeated.";
+        return 
+        false;
+    }
+    this->hp -= damage - res;
+    return true;
+}
+
+void Character::healDamage(unsigned int heal){
+    hp += heal;
+    if(hp > maxHp)
+        hp = maxHp;
+    std::cout<<"\n"<<this->label<<" healed for "<<heal<<" hp";
+}
 
 //----------------------------------------------------------------------------------------------------
 
@@ -69,8 +90,17 @@ InventoryElement Player::getInventoryElementAt(unsigned int n) const{return *(in
 
 int Player::input(std::string command){
     if(command == "w" || command == "a" || command == "s" || command == "d" || command == "W" || command == "A" || command == "S" || command == "D"){
+        //Move
         setMovementIntention(command);
         return 1;
+    }else if(command.length() == 7 && command.substr(0, 5) == "equip" && isdigit(command[6])){
+        //Equip
+        return 2;
+    }else if(command.length() == 5 && command.substr(0, 3) == "atk" ){
+        if(areStringsEqual("w", std::string(1, command[4])) || areStringsEqual("a", std::string(1, command[4]))
+        || areStringsEqual("s", std::string(1, command[4])) || areStringsEqual("d", std::string(1, command[4]))){
+            return 3;
+        }
     }
     return 0;
 }
@@ -93,6 +123,57 @@ void Player::addInventoryElement(std::unique_ptr<InventoryElement>& element){
     element->setY(0);
     this->inventoryElements.push_back(std::move(element));
 }
+
+bool Player::equipItem(unsigned int index){
+    std::vector<std::unique_ptr<InventoryElement>>::iterator it = inventoryElements.begin();
+    std::vector<std::unique_ptr<InventoryElement>>::iterator end = inventoryElements.end();
+    bool ok = true;
+    for(it; it != end; it ++){
+        if((**it).getType() == this->inventoryElements.at(index)->getType()){
+            if(&(*it) == &(this->inventoryElements.at(index))){
+                ok = false;
+            }else
+                (**it).setEquipped(false);
+        }
+    }
+    this->inventoryElements.at(index)->setEquipped(true);
+
+    return ok;
+}
+
+int Player::getEquippedWeaponIndex(){
+    std::vector<std::unique_ptr<InventoryElement>>::iterator it = inventoryElements.begin();
+    std::vector<std::unique_ptr<InventoryElement>>::iterator end = inventoryElements.end();
+    bool ok = true;
+    for(it; it != end; it ++){
+        if((**it).getIsEquipped() && areStringsEqual((**it).getType(), "weapon"))
+            it - inventoryElements.begin();
+    }
+    return -1;
+}
+
+std::vector<Effect> Player::getEquippedWeaponEffects(){
+    std::vector<std::unique_ptr<InventoryElement>>::iterator it = inventoryElements.begin();
+    std::vector<std::unique_ptr<InventoryElement>>::iterator end = inventoryElements.end();
+    bool ok = true;
+    for(it; it != end; it ++){
+        if((**it).getIsEquipped() && areStringsEqual((**it).getType(), "weapon"))
+            return (**it).getEffects();
+    }
+}
+
+std::vector<Square> Player::getEquippedWeaponAOE(){
+    std::vector<std::unique_ptr<InventoryElement>>::iterator it = inventoryElements.begin();
+    std::vector<std::unique_ptr<InventoryElement>>::iterator end = inventoryElements.end();
+    bool ok = true;
+    for(it; it != end; it ++){
+        if((**it).getIsEquipped() && areStringsEqual((**it).getType(), "weapon"))
+            return (static_cast<Weapon*>((*it).get()))->getAreasOfEffect();
+    }
+    std::vector<Square> empty;
+    return empty;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -123,7 +204,16 @@ Enemy::Enemy(const Enemy& e, unsigned int x, unsigned int y) : Character(x, y, e
 float Enemy::getNextActTime() const{return this->nextActTime;}
 void Enemy::setNextActTime(float nextActTime){this->nextActTime = nextActTime;}
 std::string Enemy::getAttackStat() const{return this->attackStat;}
-std::string Enemy::getLabel() const {return this->label;}
+unsigned int Enemy::getAtkDamage(){
+    if(areStringsEqual(this->attackStat,  "str"))
+        return this->str;
+    else if(areStringsEqual(this->attackStat,  "dex"))
+        return this->dex;
+    else if(areStringsEqual(this->attackStat,  "mnd"))
+        return this->mnd;
+    else if(areStringsEqual(this->attackStat,  "wis"))
+        return this->wis;
+}
 unsigned int Enemy::getAttackRange() const{return this->attackRange;}
 unsigned int Enemy::getSightRange() const{return this->sightRange;}
 unsigned int Enemy::getExp() const{return this->exp;}

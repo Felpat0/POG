@@ -2,9 +2,9 @@
 #define _CHARACTERS_H
 #include "InventoryElements.h"
 
-
 class Character{
     protected:
+    std::string label;
     int hp;
     unsigned int maxHp;
     float str;
@@ -30,6 +30,8 @@ class Character{
     int getMovementIntention() const;
     void resetMovementIntention();
     void setCoordinates(const int x, const int y);
+
+    std::string getLabel() const;
     unsigned int getX() const;
     unsigned int getY() const;
     unsigned int getHP() const;
@@ -41,8 +43,10 @@ class Character{
     float getRes() const;
     float getMovTime() const;
     float getActTime() const;
-
     std::string getCh() const;
+
+    bool takeDamage(std::string attackerLabel, unsigned int damage); //False = character died
+    void healDamage(unsigned int heal);
 };
 
 class Player : public Character{
@@ -64,6 +68,8 @@ class Player : public Character{
     Player(std::string name, unsigned int x, unsigned int y, unsigned int maxMp, unsigned int maxHP, float str, 
     float dex, float mnd, float wis, float res, 
     float movTime, float actTime, std::string playerClass, std::string ch);
+    
+    int getEquippedWeaponIndex(); //-1 = none
     std::string getName() const;
     unsigned int getLvl() const;
     int getMP() const;
@@ -78,6 +84,10 @@ class Player : public Character{
     int input(const std::string command);
     void setMovementIntention(const std::string direction);
     void addInventoryElement(std::unique_ptr<InventoryElement>& element);
+    bool equipItem(unsigned int index);
+
+    std::vector<Effect> getEquippedWeaponEffects();
+    std::vector<Square> getEquippedWeaponAOE();
 };
 
 
@@ -88,7 +98,6 @@ class Enemy : public Character{
     unsigned int sightRange;
     unsigned int exp;
     unsigned int gp;
-    std::string label;
     std::string attackStat; //Does it use str, dex or mnd?
     
     public:
@@ -102,11 +111,11 @@ class Enemy : public Character{
     float getNextActTime() const;
     void setNextActTime(float nextActTime);
     std::string getAttackStat() const;
-    std::string getLabel() const;
     unsigned int getAttackRange() const;
     unsigned int getSightRange() const;
     unsigned int getExp() const;
     unsigned int getGp() const;
+    unsigned int getAtkDamage();
 };
 
 #endif
