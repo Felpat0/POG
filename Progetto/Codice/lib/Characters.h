@@ -5,8 +5,8 @@
 class Character{
     protected:
     std::string label;
-    int hp;
-    unsigned int maxHp;
+    float hp;
+    float maxHp;
     float str;
     float dex;
     float mnd;
@@ -23,7 +23,7 @@ class Character{
     
     public:
     
-    Character(unsigned int x, unsigned int y, unsigned int maxHP, float str, 
+    Character(unsigned int x, unsigned int y, float maxHP, float str, 
     float dex, float mnd, float wis, float res, 
     float movTime, float actTime, std::string ch);
 
@@ -34,8 +34,10 @@ class Character{
     std::string getLabel() const;
     unsigned int getX() const;
     unsigned int getY() const;
-    unsigned int getHP() const;
-    unsigned int getMaxHP() const;
+    float getStat(std::string stat) const;
+    int abilityCheck(std::string stat, unsigned int cd);
+    float getHP() const;
+    float getMaxHP() const;
     float getStr() const;
     float getDex() const;
     float getMnd() const;
@@ -45,32 +47,40 @@ class Character{
     float getActTime() const;
     std::string getCh() const;
 
+    bool abilityCheck(std::string );
+
     bool takeDamage(std::string attackerLabel, unsigned int damage); //False = character died
     void healDamage(unsigned int heal);
+    void applySelfEffect(SelfEffect e);
+    void applyEffect(Effect e);
 };
 
 class Player : public Character{
     private:
-    std::string name;
     unsigned int lvl;
     unsigned int mp;
     unsigned int maxMp;
     unsigned int exp;
     unsigned int keys;
     unsigned int gp;
-    unsigned int upHpMax;
+    float upHpMax;
     unsigned int upMpMax;
-    unsigned int upStr;
+    float upStr;
+    float upDex;
+    float upMnd;
+    float upWis;
+    float upRes;
+    float upMovT;
+    float upActT;
     std::string playerClass;
     std::vector<std::unique_ptr<InventoryElement>> inventoryElements;
 
     public:
-    Player(std::string name, unsigned int x, unsigned int y, unsigned int maxMp, unsigned int maxHP, float str, 
+    Player(std::string label, unsigned int x, unsigned int y, unsigned int maxMp, float maxHP, float str, 
     float dex, float mnd, float wis, float res, 
     float movTime, float actTime, std::string playerClass, std::string ch);
     
     int getEquippedWeaponIndex(); //-1 = none
-    std::string getName() const;
     unsigned int getLvl() const;
     int getMP() const;
     unsigned int getMaxMP() const;
@@ -80,14 +90,40 @@ class Player : public Character{
     unsigned int getInventorySize() const;
     std::string getPlayerClass() const;
     InventoryElement getInventoryElementAt(unsigned int n) const;
+    Scroll getScrollAt(unsigned int n);
+    Weapon getWeaponAt(unsigned int n);
 
+    void setUpHpMax(float upHpMax);
+    void setUpMpMax(unsigned int upMpMax);
+    void setUpStr(float upStr);
+    void setUpDex(float upDex);
+    void setUpMnd(float upMnd);
+    void setUpWis(float upWis);
+    void setUpRes(float upRes);
+    void setUpMovT(float upMovT);
+    void setUpActT(float upActT);
+    
     int input(const std::string command);
     void setMovementIntention(const std::string direction);
-    void addInventoryElement(std::unique_ptr<InventoryElement>& element);
+    void addInventoryElement(std::unique_ptr<InventoryElement>& element, bool viewInHistory);
+    void reduceWeaponDurability(unsigned int index);
+    bool disequipItem(unsigned int index);
     bool equipItem(unsigned int index);
+    bool discardItem(unsigned int index);
+    bool identifyItem(unsigned int index);
+    void addGold(unsigned int gold);
+    void addExp(unsigned int exp);
+    void addKeys(int keys);
+    void setMp(unsigned int mp);
+    void levelUp();
 
+    unsigned int getAtkDamage(std::string stat, float pot) const;
     std::vector<Effect> getEquippedWeaponEffects();
     std::vector<Square> getEquippedWeaponAOE();
+    
+    std::vector<Square> getScrollAOEAt(unsigned int index);
+    std::vector<SelfEffect> getScrollSelfEffectsAt(unsigned int index);
+    
 };
 
 
@@ -98,7 +134,7 @@ class Enemy : public Character{
     unsigned int sightRange;
     unsigned int exp;
     unsigned int gp;
-    std::string attackStat; //Does it use str, dex or mnd?
+    std::string attackStat;
     
     public:
 

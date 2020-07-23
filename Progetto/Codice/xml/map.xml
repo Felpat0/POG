@@ -1,287 +1,344 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Game w="100" h="100" exitX="0" exitY="0" chExit="0x0057" chPath="0x0023" chFog="0x003F">
+<Game w="100" h="100" exitX="68" exitY="12" chExit="0x00BB" chPath="0x0023" chFog="0x003F">
 	<Rooms>
-		<Room id="4" label="" x="63" y="81" width="8" height="6" chWall="0x2593" chFloor="0x00B7">
+		<Room id="4" label="" x="64" y="11" width="11" height="12" chWall="0x2593" chFloor="0x00B7">
 			<Doors>
-				<Door id="1" connectedDoorId="2" connectedRoomId="5" x="63" y="84" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="53" connectedDoorId="0" connectedRoomId="0" x="64" y="81" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="62" connectedDoorId="0" connectedRoomId="0" x="69" y="81" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies/>
-			<Loots>
-				<Loot x="64" y="82" type="weapon" label="Longsword"/>
-			</Loots>
-			<treasureChests>
-				<Chest x="66" y="84" type="key" label="3"/>
-			</treasureChests>
-		</Room>
-		<Room id="5" label="" x="29" y="57" width="9" height="15" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="2" connectedDoorId="0" connectedRoomId="0" x="36" y="71" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="3" connectedDoorId="4" connectedRoomId="16" x="29" y="68" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="17" connectedDoorId="0" connectedRoomId="0" x="36" y="57" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="55" connectedDoorId="0" connectedRoomId="0" x="37" y="62" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="56" connectedDoorId="0" connectedRoomId="0" x="29" y="62" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies/>
-			<Loots>
-				<Loot x="34" y="68" type="weapon" label="Longsword"/>
-				<Loot x="36" y="64" type="gp" label="14"/>
-			</Loots>
-			<treasureChests>
-				<Chest x="35" y="69" type="gp" label="129"/>
-			</treasureChests>
-		</Room>
-		<Room id="6" label="" x="81" y="26" width="6" height="15" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="6" connectedDoorId="7" connectedRoomId="7" x="81" y="30" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies/>
-			<Loots>
-				<Loot x="84" y="29" type="weapon" label="Longsword"/>
-				<Loot x="83" y="39" type="herb" label="Poison Herbs"/>
-			</Loots>
-			<treasureChests>
-				<Chest x="82" y="34" type="gp" label="86"/>
-			</treasureChests>
-		</Room>
-		<Room id="7" label="" x="44" y="23" width="12" height="14" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="7" connectedDoorId="0" connectedRoomId="0" x="55" y="30" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="8" connectedDoorId="9" connectedRoomId="23" x="44" y="30" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="12" connectedDoorId="13" connectedRoomId="18" x="55" y="33" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="66" connectedDoorId="0" connectedRoomId="0" x="44" y="35" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="67" connectedDoorId="0" connectedRoomId="0" x="46" y="23" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies/>
-			<Loots>
-				<Loot x="50" y="29" type="gp" label="9"/>
-			</Loots>
-		</Room>
-		<Room id="8" label="" x="45" y="3" width="9" height="8" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="14" connectedDoorId="15" connectedRoomId="20" x="45" y="4" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="34" connectedDoorId="0" connectedRoomId="0" x="53" y="7" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="35" connectedDoorId="36" connectedRoomId="20" x="45" y="7" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="44" connectedDoorId="0" connectedRoomId="0" x="46" y="10" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies/>
-			<Loots>
-				<Loot x="52" y="5" type="potion" label="Healing Potion"/>
-			</Loots>
-		</Room>
-		<Room id="9" label="" x="39" y="36" width="12" height="10" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="18" connectedDoorId="19" connectedRoomId="20" x="40" y="36" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="58" connectedDoorId="0" connectedRoomId="0" x="41" y="36" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="1" connectedDoorId="2" connectedRoomId="6" x="64" y="16" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="19" connectedDoorId="0" connectedRoomId="0" x="64" y="20" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="20" connectedDoorId="21" connectedRoomId="18" x="74" y="20" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
 			</Doors>
 			<Enemies>
-				<Enemy label="Lance Knight" x="49" y="40"/>
+				<Enemy label="Goblin" x="70" y="21"/>
 			</Enemies>
 			<Loots>
-				<Loot x="41" y="43" type="weapon" label="Longsword"/>
+				<Loot x="73" y="16" type="scroll" label="Aura Burn"/>
+				<Loot x="66" y="12" type="scroll" label="Magic Missle"/>
+				<Loot x="70" y="14" type="scroll" label="Guiding Light"/>
+				<Loot x="66" y="18" type="key" label="1"/>
+				<Loot x="67" y="20" type="key" label="1"/>
 			</Loots>
 			<treasureChests>
-				<Chest x="46" y="42" type="gp" label="257"/>
+				<Chest x="71" y="16" type="gp" label="152"/>
 			</treasureChests>
 		</Room>
-		<Room id="10" label="" x="15" y="40" width="8" height="14" chWall="0x2593" chFloor="0x00B7">
+		<Room id="5" label="" x="42" y="49" width="13" height="14" chWall="0x2593" chFloor="0x00B7">
 			<Doors>
-				<Door id="20" connectedDoorId="21" connectedRoomId="16" x="16" y="53" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="30" connectedDoorId="0" connectedRoomId="0" x="20" y="53" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="31" connectedDoorId="32" connectedRoomId="23" x="20" y="40" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="40" connectedDoorId="0" connectedRoomId="0" x="21" y="40" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="3" connectedDoorId="4" connectedRoomId="18" x="54" y="52" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="52" connectedDoorId="0" connectedRoomId="0" x="43" y="49" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="53" connectedDoorId="54" connectedRoomId="9" x="43" y="62" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
 			</Doors>
 			<Enemies>
-				<Enemy label="Lance Knight" x="20" y="48"/>
+				<Enemy label="Lance Knight" x="50" y="60"/>
+				<Enemy label="Goblin" x="50" y="55"/>
 			</Enemies>
 			<Loots>
-				<Loot x="21" y="46" type="weapon" label="Longsword"/>
-				<Loot x="17" y="43" type="potion" label="Strength Potion"/>
+				<Loot x="52" y="56" type="weapon" label="Bomb"/>
+				<Loot x="51" y="61" type="scroll" label="Guiding Light"/>
+				<Loot x="44" y="53" type="herb" label="Trial Herbs"/>
+				<Loot x="49" y="54" type="gp" label="10"/>
+				<Loot x="43" y="55" type="scroll" label="Aura Burn"/>
+			</Loots>
+		</Room>
+		<Room id="6" label="" x="29" y="33" width="8" height="13" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="2" connectedDoorId="0" connectedRoomId="0" x="34" y="33" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="9" connectedDoorId="10" connectedRoomId="14" x="36" y="43" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="17" connectedDoorId="0" connectedRoomId="0" x="35" y="45" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="43" connectedDoorId="0" connectedRoomId="0" x="29" y="44" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="44" connectedDoorId="45" connectedRoomId="18" x="36" y="44" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies>
+				<Enemy label="Goblin" x="32" y="40"/>
+			</Enemies>
+			<Loots>
+				<Loot x="30" y="36" type="weapon" label="Bow"/>
+				<Loot x="30" y="37" type="gp" label="7"/>
+				<Loot x="30" y="40" type="scroll" label="Healing Word"/>
+				<Loot x="32" y="36" type="gp" label="10"/>
+			</Loots>
+		</Room>
+		<Room id="7" label="" x="20" y="77" width="14" height="14" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="11" connectedDoorId="12" connectedRoomId="16" x="33" y="81" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="58" connectedDoorId="0" connectedRoomId="0" x="33" y="85" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="59" connectedDoorId="60" connectedRoomId="10" x="20" y="85" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies/>
+			<Loots>
+				<Loot x="25" y="82" type="gp" label="8"/>
+				<Loot x="27" y="82" type="key" label="2"/>
+				<Loot x="28" y="79" type="herb" label="Miraculous Herbs"/>
+			</Loots>
+		</Room>
+		<Room id="8" label="" x="29" y="2" width="9" height="11" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="14" connectedDoorId="15" connectedRoomId="11" x="37" y="3" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="29" connectedDoorId="0" connectedRoomId="0" x="30" y="12" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies>
+				<Enemy label="Crossbow Goblin" x="34" y="7"/>
+			</Enemies>
+			<Loots>
+				<Loot x="33" y="9" type="scroll" label="Aura Burn"/>
+				<Loot x="30" y="10" type="gp" label="2"/>
+				<Loot x="34" y="5" type="weapon" label="Bomb"/>
+				<Loot x="32" y="3" type="scroll" label="Guiding Light"/>
+				<Loot x="32" y="7" type="weapon" label="Bomb"/>
 			</Loots>
 			<treasureChests>
-				<Chest x="20" y="51" type="key" label="2"/>
+				<Chest x="31" y="5" type="key" label="1"/>
 			</treasureChests>
 		</Room>
-		<Room id="11" label="" x="38" y="74" width="14" height="8" chWall="0x2593" chFloor="0x00B7">
+		<Room id="9" label="" x="41" y="70" width="14" height="11" chWall="0x2593" chFloor="0x00B7">
 			<Doors>
-				<Door id="22" connectedDoorId="23" connectedRoomId="22" x="51" y="76" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="46" connectedDoorId="0" connectedRoomId="0" x="38" y="77" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="47" connectedDoorId="0" connectedRoomId="0" x="51" y="77" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="16" connectedDoorId="17" connectedRoomId="6" x="41" y="78" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="54" connectedDoorId="0" connectedRoomId="0" x="43" y="70" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="64" connectedDoorId="0" connectedRoomId="0" x="54" y="73" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="65" connectedDoorId="0" connectedRoomId="0" x="41" y="73" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
 			</Doors>
 			<Enemies/>
 			<Loots>
-				<Loot x="44" y="79" type="weapon" label="Longsword"/>
-				<Loot x="50" y="80" type="gp" label="8"/>
+				<Loot x="53" y="75" type="key" label="1"/>
+				<Loot x="42" y="77" type="weapon" label="Longsword"/>
+				<Loot x="52" y="77" type="weapon" label="Bomb"/>
+				<Loot x="44" y="73" type="gp" label="11"/>
+				<Loot x="47" y="76" type="weapon" label="Dagger"/>
+			</Loots>
+		</Room>
+		<Room id="10" label="" x="12" y="19" width="9" height="11" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="18" connectedDoorId="19" connectedRoomId="4" x="20" y="20" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="25" connectedDoorId="0" connectedRoomId="0" x="20" y="26" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="26" connectedDoorId="27" connectedRoomId="20" x="12" y="26" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="60" connectedDoorId="0" connectedRoomId="0" x="15" y="29" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies/>
+			<Loots>
+				<Loot x="16" y="25" type="protection" label="Leather Armor"/>
+				<Loot x="15" y="25" type="key" label="1"/>
+				<Loot x="16" y="22" type="gp" label="2"/>
+			</Loots>
+		</Room>
+		<Room id="11" label="" x="81" y="25" width="15" height="15" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="6" connectedDoorId="0" connectedRoomId="0" x="85" y="39" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="7" connectedDoorId="8" connectedRoomId="15" x="85" y="25" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="15" connectedDoorId="0" connectedRoomId="0" x="82" y="25" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="22" connectedDoorId="23" connectedRoomId="13" x="81" y="26" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="41" connectedDoorId="0" connectedRoomId="0" x="82" y="39" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="47" connectedDoorId="0" connectedRoomId="0" x="86" y="39" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="48" connectedDoorId="49" connectedRoomId="15" x="86" y="25" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies/>
+			<Loots>
+				<Loot x="89" y="26" type="scroll" label="Magic Missle"/>
+				<Loot x="82" y="37" type="herb" label="Trial Herbs"/>
+				<Loot x="86" y="32" type="scroll" label="Guiding Light"/>
+				<Loot x="91" y="35" type="key" label="2"/>
 			</Loots>
 			<treasureChests>
-				<Chest x="48" y="80" type="gp" label="246"/>
+				<Chest x="86" y="28" type="gp" label="83"/>
 			</treasureChests>
 		</Room>
-		<Room id="12" label="" x="10" y="78" width="9" height="14" chWall="0x2593" chFloor="0x00B7">
+		<Room id="12" label="" x="10" y="11" width="7" height="9" chWall="0x2593" chFloor="0x00B7">
 			<Doors>
-				<Door id="27" connectedDoorId="28" connectedRoomId="16" x="18" y="83" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="28" connectedDoorId="29" connectedRoomId="8" x="16" y="15" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
 			</Doors>
-			<Enemies/>
+			<Enemies>
+				<Enemy label="Goblin" x="14" y="14"/>
+			</Enemies>
 			<Loots>
-				<Loot x="14" y="83" type="herb" label="Poison Herbs"/>
+				<Loot x="12" y="17" type="scroll" label="Aura Burn"/>
+				<Loot x="14" y="16" type="gp" label="8"/>
+				<Loot x="14" y="15" type="weapon" label="Longsword"/>
+				<Loot x="13" y="12" type="weapon" label="Bow"/>
 			</Loots>
 			<treasureChests>
-				<Chest x="16" y="88" type="key" label="3"/>
+				<Chest x="15" y="16" type="gp" label="96"/>
 			</treasureChests>
 		</Room>
-		<Room id="13" label="" x="74" y="2" width="12" height="7" chWall="0x2593" chFloor="0x00B7">
+		<Room id="13" label="" x="35" y="21" width="14" height="8" chWall="0x2593" chFloor="0x00B7">
 			<Doors>
-				<Door id="33" connectedDoorId="34" connectedRoomId="8" x="74" y="7" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="23" connectedDoorId="0" connectedRoomId="0" x="48" y="26" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="24" connectedDoorId="25" connectedRoomId="10" x="35" y="26" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="30" connectedDoorId="31" connectedRoomId="22" x="48" y="23" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
 			</Doors>
 			<Enemies>
-				<Enemy label="Goblin" x="81" y="5"/>
+				<Enemy label="Crossbow Goblin" x="46" y="24"/>
 			</Enemies>
 			<Loots>
-				<Loot x="81" y="3" type="weapon" label="Longsword"/>
+				<Loot x="41" y="26" type="key" label="1"/>
+				<Loot x="40" y="26" type="key" label="2"/>
+				<Loot x="36" y="26" type="key" label="1"/>
+				<Loot x="43" y="27" type="gp" label="5"/>
 			</Loots>
 		</Room>
-		<Room id="14" label="" x="76" y="69" width="6" height="11" chWall="0x2593" chFloor="0x00B7">
+		<Room id="14" label="" x="58" y="65" width="8" height="13" chWall="0x2593" chFloor="0x00B7">
 			<Doors>
-				<Door id="41" connectedDoorId="42" connectedRoomId="19" x="76" y="72" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies/>
-			<Loots>
-				<Loot x="77" y="72" type="gp" label="12"/>
-				<Loot x="77" y="71" type="gp" label="6"/>
-			</Loots>
-		</Room>
-		<Room id="15" label="" x="4" y="16" width="12" height="13" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="5" connectedDoorId="0" connectedRoomId="0" x="13" y="28" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="43" connectedDoorId="44" connectedRoomId="8" x="15" y="18" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="10" connectedDoorId="0" connectedRoomId="0" x="59" y="65" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="32" connectedDoorId="33" connectedRoomId="22" x="65" y="71" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="62" connectedDoorId="0" connectedRoomId="0" x="65" y="73" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="63" connectedDoorId="64" connectedRoomId="9" x="58" y="73" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="67" connectedDoorId="0" connectedRoomId="0" x="58" y="68" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="68" connectedDoorId="69" connectedRoomId="16" x="65" y="68" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
 			</Doors>
 			<Enemies>
-				<Enemy label="Wolf" x="7" y="17"/>
-				<Enemy label="Wolf" x="8" y="21"/>
+				<Enemy label="Lance Knight" x="60" y="75"/>
+				<Enemy label="Lance Knight" x="64" y="74"/>
 			</Enemies>
 			<Loots>
-				<Loot x="5" y="23" type="potion" label="Strength Potion"/>
-				<Loot x="12" y="19" type="potion" label="Strength Potion"/>
-			</Loots>
-		</Room>
-		<Room id="16" label="" x="14" y="66" width="13" height="13" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="4" connectedDoorId="5" connectedRoomId="15" x="26" y="68" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="11" connectedDoorId="0" connectedRoomId="0" x="25" y="66" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="21" connectedDoorId="0" connectedRoomId="0" x="16" y="66" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="28" connectedDoorId="0" connectedRoomId="0" x="20" y="78" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="29" connectedDoorId="30" connectedRoomId="10" x="20" y="66" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="45" connectedDoorId="46" connectedRoomId="11" x="26" y="77" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies/>
-			<Loots>
-				<Loot x="25" y="73" type="weapon" label="Longsword"/>
-			</Loots>
-		</Room>
-		<Room id="17" label="" x="3" y="1" width="15" height="12" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="48" connectedDoorId="49" connectedRoomId="23" x="17" y="6" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies>
-				<Enemy label="Crossbow Goblin" x="5" y="6"/>
-			</Enemies>
-			<Loots>
-				<Loot x="9" y="9" type="weapon" label="Longsword"/>
-				<Loot x="12" y="9" type="gp" label="8"/>
+				<Loot x="60" y="67" type="weapon" label="Bow"/>
+				<Loot x="63" y="73" type="weapon" label="Bow"/>
+				<Loot x="64" y="68" type="weapon" label="Wand Of Explosive Fire"/>
+				<Loot x="61" y="71" type="weapon" label="Longsword"/>
 			</Loots>
 			<treasureChests>
-				<Chest x="7" y="8" type="gp" label="235"/>
+				<Chest x="60" y="68" type="gp" label="300"/>
 			</treasureChests>
 		</Room>
-		<Room id="18" label="" x="58" y="8" width="11" height="12" chWall="0x2593" chFloor="0x00B7">
+		<Room id="15" label="" x="84" y="9" width="7" height="13" chWall="0x2593" chFloor="0x00B7">
 			<Doors>
-				<Door id="13" connectedDoorId="0" connectedRoomId="0" x="59" y="19" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="50" connectedDoorId="51" connectedRoomId="19" x="64" y="19" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies/>
-			<Loots>
-				<Loot x="65" y="13" type="gp" label="7"/>
-				<Loot x="59" y="14" type="gp" label="14"/>
-			</Loots>
-		</Room>
-		<Room id="19" label="" x="58" y="54" width="15" height="12" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="25" connectedDoorId="0" connectedRoomId="0" x="59" y="65" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="26" connectedDoorId="0" connectedRoomId="0" x="59" y="54" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="42" connectedDoorId="0" connectedRoomId="0" x="71" y="65" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="51" connectedDoorId="0" connectedRoomId="0" x="64" y="54" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="52" connectedDoorId="53" connectedRoomId="4" x="64" y="65" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="54" connectedDoorId="55" connectedRoomId="5" x="58" y="62" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="60" connectedDoorId="0" connectedRoomId="0" x="69" y="54" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="61" connectedDoorId="62" connectedRoomId="4" x="69" y="65" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="8" connectedDoorId="0" connectedRoomId="0" x="85" y="21" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="34" connectedDoorId="35" connectedRoomId="18" x="84" y="18" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="49" connectedDoorId="0" connectedRoomId="0" x="86" y="21" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
 			</Doors>
 			<Enemies>
-				<Enemy label="Lance Knight" x="63" y="64"/>
-				<Enemy label="Crossbow Goblin" x="69" y="55"/>
+				<Enemy label="Wolf" x="89" y="20"/>
 			</Enemies>
 			<Loots>
-				<Loot x="65" y="56" type="gp" label="6"/>
-			</Loots>
-		</Room>
-		<Room id="20" label="" x="32" y="1" width="12" height="9" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="15" connectedDoorId="0" connectedRoomId="0" x="43" y="4" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="16" connectedDoorId="17" connectedRoomId="5" x="36" y="9" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="19" connectedDoorId="0" connectedRoomId="0" x="40" y="9" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="36" connectedDoorId="0" connectedRoomId="0" x="43" y="7" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="37" connectedDoorId="38" connectedRoomId="23" x="32" y="7" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="57" connectedDoorId="58" connectedRoomId="9" x="41" y="9" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies/>
-			<Loots>
-				<Loot x="34" y="4" type="herb" label="Poison Herbs"/>
-				<Loot x="34" y="5" type="gp" label="1"/>
+				<Loot x="87" y="15" type="scroll" label="Magic Missle"/>
+				<Loot x="85" y="15" type="gp" label="12"/>
+				<Loot x="88" y="16" type="gp" label="10"/>
+				<Loot x="88" y="12" type="weapon" label="Bow"/>
 			</Loots>
 			<treasureChests>
-				<Chest x="36" y="5" type="gp" label="286"/>
+				<Chest x="85" y="12" type="gp" label="281"/>
 			</treasureChests>
 		</Room>
-		<Room id="21" label="" x="83" y="46" width="12" height="9" chWall="0x2593" chFloor="0x00B7">
+		<Room id="16" label="" x="78" y="58" width="14" height="10" chWall="0x2593" chFloor="0x00B7">
 			<Doors>
-				<Door id="59" connectedDoorId="60" connectedRoomId="19" x="83" y="48" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies>
-				<Enemy label="Lance Knight" x="91" y="50"/>
-			</Enemies>
-			<Loots>
-				<Loot x="87" y="48" type="gp" label="1"/>
-				<Loot x="85" y="50" type="weapon" label="Longsword"/>
-			</Loots>
-		</Room>
-		<Room id="22" label="" x="53" y="67" width="8" height="8" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="23" connectedDoorId="0" connectedRoomId="0" x="59" y="74" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="24" connectedDoorId="25" connectedRoomId="19" x="59" y="67" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="63" connectedDoorId="64" connectedRoomId="23" x="53" y="72" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-			</Doors>
-			<Enemies>
-				<Enemy label="Lance Knight" x="58" y="70"/>
-			</Enemies>
-			<Loots>
-				<Loot x="59" y="70" type="weapon" label="Longsword"/>
-				<Loot x="58" y="68" type="gp" label="7"/>
-			</Loots>
-		</Room>
-		<Room id="23" label="" x="19" y="29" width="10" height="10" chWall="0x2593" chFloor="0x00B7">
-			<Doors>
-				<Door id="9" connectedDoorId="0" connectedRoomId="0" x="28" y="30" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="10" connectedDoorId="11" connectedRoomId="16" x="25" y="38" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="32" connectedDoorId="0" connectedRoomId="0" x="20" y="38" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="38" connectedDoorId="0" connectedRoomId="0" x="21" y="29" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="39" connectedDoorId="40" connectedRoomId="10" x="21" y="38" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="49" connectedDoorId="0" connectedRoomId="0" x="20" y="29" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="64" connectedDoorId="0" connectedRoomId="0" x="27" y="38" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
-				<Door id="65" connectedDoorId="66" connectedRoomId="7" x="28" y="35" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="12" connectedDoorId="0" connectedRoomId="0" x="85" y="67" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="13" connectedDoorId="0" connectedRoomId="0" x="85" y="58" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="38" connectedDoorId="39" connectedRoomId="18" x="82" y="58" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="69" connectedDoorId="0" connectedRoomId="0" x="79" y="67" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
 			</Doors>
 			<Enemies/>
 			<Loots>
-				<Loot x="27" y="30" type="weapon" label="Longsword"/>
+				<Loot x="87" y="65" type="scroll" label="Magic Missle"/>
+				<Loot x="80" y="62" type="weapon" label="Dagger"/>
+				<Loot x="87" y="62" type="key" label="1"/>
+				<Loot x="84" y="60" type="potion" label="Healing Potion"/>
+			</Loots>
+		</Room>
+		<Room id="17" label="" x="6" y="40" width="7" height="8" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="42" connectedDoorId="43" connectedRoomId="6" x="12" y="44" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies/>
+			<Loots>
+				<Loot x="11" y="46" type="weapon" label="Longsword"/>
+				<Loot x="9" y="46" type="weapon" label="Bomb"/>
+				<Loot x="11" y="41" type="herb" label="Trial Herbs"/>
+			</Loots>
+		</Room>
+		<Room id="18" label="" x="75" y="42" width="15" height="6" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="4" connectedDoorId="0" connectedRoomId="0" x="85" y="47" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="5" connectedDoorId="6" connectedRoomId="11" x="85" y="42" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="21" connectedDoorId="0" connectedRoomId="0" x="76" y="42" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="35" connectedDoorId="0" connectedRoomId="0" x="77" y="42" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="36" connectedDoorId="37" connectedRoomId="22" x="77" y="47" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="39" connectedDoorId="0" connectedRoomId="0" x="82" y="47" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="40" connectedDoorId="41" connectedRoomId="11" x="82" y="42" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="45" connectedDoorId="0" connectedRoomId="0" x="75" y="44" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="46" connectedDoorId="47" connectedRoomId="11" x="86" y="42" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies>
+				<Enemy label="Wolf" x="77" y="45"/>
+				<Enemy label="Goblin" x="87" y="44"/>
+			</Enemies>
+			<Loots>
+				<Loot x="87" y="43" type="weapon" label="Longsword"/>
+				<Loot x="76" y="43" type="key" label="1"/>
+				<Loot x="78" y="46" type="scroll" label="Aura Burn"/>
+				<Loot x="88" y="46" type="herb" label="Miraculous Herbs"/>
+			</Loots>
+		</Room>
+		<Room id="19" label="" x="40" y="83" width="10" height="6" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="50" connectedDoorId="0" connectedRoomId="0" x="40" y="87" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="56" connectedDoorId="0" connectedRoomId="0" x="49" y="85" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="57" connectedDoorId="58" connectedRoomId="7" x="40" y="85" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies>
+				<Enemy label="Wolf" x="42" y="86"/>
+			</Enemies>
+			<Loots>
+				<Loot x="41" y="84" type="key" label="1"/>
+				<Loot x="48" y="84" type="scroll" label="Magic Missle"/>
+				<Loot x="42" y="87" type="scroll" label="Magic Missle"/>
+				<Loot x="47" y="84" type="gp" label="9"/>
+			</Loots>
+		</Room>
+		<Room id="20" label="" x="1" y="21" width="6" height="11" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="27" connectedDoorId="0" connectedRoomId="0" x="6" y="26" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="51" connectedDoorId="52" connectedRoomId="5" x="6" y="30" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies>
+				<Enemy label="Goblin" x="5" y="27"/>
+			</Enemies>
+			<Loots>
+				<Loot x="3" y="29" type="scroll" label="Aura Burn"/>
+				<Loot x="5" y="23" type="gp" label="1"/>
+				<Loot x="2" y="27" type="herb" label="Miraculous Herbs"/>
+				<Loot x="3" y="25" type="key" label="2"/>
+			</Loots>
+		</Room>
+		<Room id="21" label="" x="81" y="84" width="12" height="9" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="55" connectedDoorId="56" connectedRoomId="19" x="81" y="85" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies>
+				<Enemy label="Goblin" x="87" y="90"/>
+				<Enemy label="Lance Knight" x="89" y="89"/>
+			</Enemies>
+			<Loots>
+				<Loot x="87" y="91" type="key" label="1"/>
+				<Loot x="84" y="87" type="weapon" label="Wand Of Explosive Fire"/>
+				<Loot x="86" y="89" type="potion" label="Strength Potion"/>
+				<Loot x="83" y="88" type="weapon" label="Axe"/>
+				<Loot x="88" y="89" type="scroll" label="Magic Missle"/>
+			</Loots>
+		</Room>
+		<Room id="22" label="" x="68" y="69" width="11" height="8" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="31" connectedDoorId="0" connectedRoomId="0" x="69" y="69" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="33" connectedDoorId="0" connectedRoomId="0" x="68" y="71" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="37" connectedDoorId="0" connectedRoomId="0" x="77" y="69" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+				<Door id="61" connectedDoorId="62" connectedRoomId="14" x="68" y="73" room="" locked="1" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies>
+				<Enemy label="Goblin" x="71" y="72"/>
+			</Enemies>
+			<Loots>
+				<Loot x="73" y="71" type="weapon" label="Bomb"/>
+				<Loot x="76" y="75" type="weapon" label="Wand Of Explosive Fire"/>
+				<Loot x="69" y="73" type="scroll" label="Guiding Light"/>
+			</Loots>
+		</Room>
+		<Room id="23" label="" x="16" y="66" width="6" height="10" chWall="0x2593" chFloor="0x00B7">
+			<Doors>
+				<Door id="66" connectedDoorId="67" connectedRoomId="14" x="21" y="68" room="" locked="0" chOpen="0x004F" chLocked="0x00D8"/>
+			</Doors>
+			<Enemies>
+				<Enemy label="Goblin" x="17" y="67"/>
+			</Enemies>
+			<Loots>
+				<Loot x="19" y="74" type="weapon" label="Longsword"/>
+				<Loot x="20" y="69" type="gp" label="1"/>
+				<Loot x="18" y="67" type="herb" label="Trial Herbs"/>
+				<Loot x="17" y="72" type="weapon" label="Bow"/>
 			</Loots>
 		</Room>
 	</Rooms>

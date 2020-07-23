@@ -25,8 +25,8 @@
 #define PLAYER_SIGHT 10
 #define MIN_ENEMIES_NUMBER 0
 #define MAX_ENEMIES_NUMBER 2
-#define MIN_ITEMS_NUMBER 1
-#define MAX_ITEMS_NUMBER 2
+#define MIN_ITEMS_NUMBER 5
+#define MAX_ITEMS_NUMBER 7
 #define MIN_CHESTS_NUMBER 1
 #define MAX_CHESTS_NUMBER 1
 #define MIN_GP_LOOT_NUMBER 1
@@ -38,6 +38,8 @@
 #define MAX_CHEST_GOLD 300
 #define MIN_CHEST_KEYS 2
 #define MAX_CHEST_KEYS 3
+
+extern std::string history;
 
 class Effect{
     private:
@@ -69,6 +71,8 @@ class InventoryElement{
     int y;
     bool isChest;
     bool isEquipped;
+    bool isIdentified;
+    bool isIdentifiable;
     std::string label;
     std::string type;
     std::string ch;
@@ -83,17 +87,22 @@ class InventoryElement{
     void setY(unsigned int y);
     void setChest(bool input);
     void setEquipped(bool input);
+    void setIdentified(bool input);
+    void setIsIdentifiable(bool input);
 
     unsigned int getX() const;
     unsigned int getY() const;
     bool getIsChest() const;
     bool getIsEquipped() const;
+    bool getIsIdentified() const;
+    bool getIsIdentifiable() const;
     std::string getLabel() const;
     std::string getType() const;
     std::string getCh() const;
     std::vector<Effect> getEffects() const;
 
     void addEffect(Effect effect);
+    std::string getDescription();
 };
 
 class Square{
@@ -106,7 +115,7 @@ class Square{
     public:
     Square(int fd, int rd, std::string stat, float pot);
 
-    int gedFd() const;
+    int getFd() const;
     int getRd() const;
     float getPot() const;
     std::string getStat() const;
@@ -127,6 +136,9 @@ class Weapon : public InventoryElement{
     std::vector<Square> getAreasOfEffect() const;
 
     void addAreasOfEffect(Square area);
+    void setDurability(unsigned int n);
+
+    std::string getDescription();
 };
 
 class Scroll : public InventoryElement{
@@ -141,10 +153,13 @@ class Scroll : public InventoryElement{
     Scroll(Scroll& s, unsigned int x, unsigned int y);
     unsigned int getRange() const;
     float getMpCost() const;
+    std::vector<SelfEffect> getSelfEffects() const;
     std::vector<Square> getAreasOfEffect() const;
 
     void addSelfEffect(SelfEffect s);
     void addAreasOfEffect(Square s);
+
+    std::string getDescription();
 };
 bool areStringsEqual(std::string a, std::string b);
 

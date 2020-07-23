@@ -32,32 +32,26 @@ int main(){
     int error = 0;
     string choice;
     unsigned int actionType;
+    //system("cls");
     while(gameState == 0){
         do{
-            //system("cls");
             //Clear the fog around the player
             game.clearFog();
-            std::cout<<"\nX:"<<game.getPlayer()->getX()<<" Y:"<<game.getPlayer()->getY()<<"\n\n";
+            std::cout<<"\nI:"<<game.getPlayer()->getY()<<" J:"<<game.getPlayer()->getX()<<"\n\n";
             game.printInterface();
-            cout<<endl<<"What would you like to do?\nW = move north\nS = move south\nA = move ovest\nD = move east\nEquip objectIndex = equip an object, a weapon or an armor";
-            cout<<endl<<"Atk w/a/s/d = attack in the chosen direction\nUse w/a/s/d = use the equipped object in the chosen direction\nCast spellIndex w/a/s/d = cast the spell at the index spellIndex";
-            cout<<endl<<"Open w/a/s/d = open the door in the chosen direction\nTake = loot the surrounding items\nDiscard objectIndex = discard the object at the index objectIndex";
-            cout<<endl<<"Identify objectIndex = show the description of the object at the index objectIndex\n";
             try{
                 getline(std::cin, choice);
             }catch(int a){
                 std::cout<<"\nThe input is not valid\n";
             }
-            std::cout<<"1";
+            //system("cls");
             actionType = game.getPlayer()->input(choice);
-            std::cout<<"2";
             //If the user inserted a valid action
             if(actionType != 0){
                 error = 0;
                 switch (actionType){
                     case 1: 
                         //Player movement
-                        std::cout<<"3";
                         switch (game.getPlayer()->getMovementIntention()){
                             case 1: //Up
                                 if(game.isWalkable(game.getPlayer()->getX(), game.getPlayer()->getY() - 1))
@@ -84,62 +78,117 @@ int main(){
                                     error = 1;
                                 break;
                         }
-                        std::cout<<"4";
-                        //If Player completed an action without errors...
-                        if(error == 0){ 
-                            //Make the time pass
+                        if(error == 0)
                             game.lapsedTime += game.getPlayer()->getMovTime();
-                            //Enemies do actions
-                            game.moveEnemies();
-                        }
                         game.getPlayer()->resetMovementIntention();
-                        std::cout<<"5";
                         break;
                     case 2:
                         //Equip item
-                        if(!game.getPlayer()->equipItem((choice[6]) - '0'))
-                            error = 2;
-                        else 
+                        if(game.getPlayer()->equipItem((choice[6]) - '0'))
                             game.lapsedTime += game.getPlayer()->getActTime();
                         break;
                     case 3:
                         //Attack
-                        //"Ask" the Player object the index of his weapon and its damage
-                        std::cout<<"\n"<<game.getPlayer()->getEquippedWeaponAOE().back().getPot()<<"\n";
-                        //Check the effects/areas of effect to find the hitted enemies
-
-                        //Do playerDamage - enemyRes
-                        if(areStringsEqual("w", std::string(1, choice[4]))){
-                            //Atk up
-                        }else if(areStringsEqual("a", std::string(1, choice[4]))){
-                            //Atk down
-                        }else if(areStringsEqual("s", std::string(1, choice[4]))){
-                            //Atk left
+                        game.playerAttack(choice[4]); //Even if player hits none, time passes
+                        game.lapsedTime += game.getPlayer()->getActTime();
+                        break;
+                    case 4:
+                        //Cast spell
+                        if(game.playerCastSpell(choice[7], choice[5] - '0'))
+                            game.lapsedTime += game.getPlayer()->getActTime();
+                        break;
+                    case 5:
+                        //Use item
+                        if(game.playerUse(choice[4] - '0'))
+                            game.lapsedTime += game.getPlayer()->getActTime();
+                       break;
+                    case 6:
+                        //Loot items
+                        if(game.getPlayer()->getInventorySize() == 10){
+                            std::cout<<"\nYour inventory is full, you can't loot more items.";
+                            std::cin.ignore();
                         }else{
-                            //Atk right
-
+                            game.playerLoot();
+                            game.lapsedTime += game.getPlayer()->getActTime();
                         }
+                        break;
+                    case 7:
+                        //Discard item
+                        if(game.getPlayer()->discardItem(choice[8] - '0'))
+                            game.lapsedTime += game.getPlayer()->getActTime();
+                        break;
+                    case 8:
+                        //Identify item
+                        if(game.getPlayer()->identifyItem(choice[9] - '0'))
+                            game.lapsedTime += game.getPlayer()->getActTime();
+                        break;
+                    case 9:
+                        //Open door/chest
+                        if(game.playerOpen(choice[5]))
+                            game.lapsedTime += game.getPlayer()->getActTime();
                         break;
                     default:
                         break;
                 }
                 
             }else{
-                std::cout<<"\nThe input is not valid, press enter to retry\n";
+                std::cout<<"\nThe input is not valid. Press enter to retry.\n";
                 fflush(stdin);
                 cin.ignore();
             }
             if(error == 1){
-                std::cout<<"You can't move in this direction. Press enter to retry";
+                std::cout<<"\nYou can't move in this direction. Press enter to retry.\n";
+                fflush(stdin);
+                cin.ignore();
             }else if(error == 2){
-                std::cout<<"\nThe index is not valid. Press enter to retry";
+                std::cout<<"\nThe index is not valid. Press enter to retry.\n";
+                fflush(stdin);
+                cin.ignore();
+            }else if(error == 3){
+                std::cout<<"\nThe chosen item is not equipped. Press enter to continue.\n";
+                fflush(stdin);
+                cin.ignore();
+            }else if(error == 4){
+                std::cout<<"\nThe chosen item has not been identified yet. Press enter to continue.\n";
+                fflush(stdin);
+                cin.ignore();
             }
         }while(actionType == 0 || error != 0);
-        
+        //Check if player died because of an ability check
+        if(game.getPlayer()->getHP() == 0){
+            gameState = 1;
+            break;
+        }
+        //Move enemies
+        if(game.getPlayer()->getX() == game.getExitX() &&  game.getPlayer()->getY() == game.getExitY()){
+            gameState = 2;
+            break;
+        }
+        game.moveEnemies();
+        //Check if the player died after the enemy moves
+        if(game.getPlayer()->getHP() == 0){
+            gameState = 1;
+            break;
+        }
     }
 
+    if(gameState == 2){
+        system("cls");
+        int score = 0;
+        for(int i = 1; i != game.getPlayer()->getLvl(); i++){
+            score += 100 * i;
+        }
+        score += 25 * game.getPlayer()->getGp() + game.getPlayer()->getExp();
+        std::cout<<"\n\n\n                         \\(*-*)/ Congratulations! You won with a score of "<<score<<" \\(*-*)/\n\n\n";
+    }else{
+        game.printInterface();
+        fflush(stdin);
+        cin.ignore();
+        system("cls");
+        std::cout<<"\n\n\n                          /(-.-)\\ You lost... Better luck next time! /(-.-)\\\n\n\n";
+    }
     //Free pointers
-    //delete game.getPlayer();
+    delete game.getPlayer();
     
     return 0;
 }

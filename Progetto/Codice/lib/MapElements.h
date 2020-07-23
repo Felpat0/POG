@@ -2,7 +2,6 @@
 #define _ELEMENTS_H
 #include "Characters.h"
 
-
 class Door{
     private:
     std::string roomLabel;
@@ -30,6 +29,7 @@ class Door{
 
     void setConnectedDoorId(unsigned int id);
     void setConnectedRoomId(unsigned int id);
+    void setLocked(bool input);
 };
 
 class Room{
@@ -91,12 +91,14 @@ class Game{
     Game();
     //~Game();
     Player* getPlayer() const;
+    unsigned int getExitX() const;
+    unsigned int getExitY() const;
     void generateMap();
     void initMap();
     void exportMap();
     void printInterface();
-    bool isWalkable(int x, int y);
-    bool isWalkableForPlayer(int x, int y);
+    bool isWalkable(int x, int y); //Use only after generation
+    bool isWalkableForPlayer(int x, int y); //Use only after generation
     int getElementType(int i, int j);
     void addRoom(std::unique_ptr<Room>& room);
     void addRoom(int id, std::string chWall, std::string chFloor);
@@ -109,9 +111,19 @@ class Game{
     void chooseClass();
     void clearFog();
     void moveEnemies();
-    int getDistance(Character& a, Character& b) const;
-    int getDistance(int x1, int y1, int x2, int y2) const;
-    bool dealDamage(Character* attacker, unsigned int x, unsigned int y);
+    unsigned int getDistance(Character& a, Character& b) const;
+    unsigned int getDistance(int x1, int y1, int x2, int y2) const;
+    int getEnemyIndexAtPosition(unsigned int i, unsigned int j);
+    int getItemIndexAtPosition(unsigned int i, unsigned int j);
+    int getWeaponIndexAtPosition(unsigned int i, unsigned int j);
+    int getScrollIndexAtPosition(unsigned int i, unsigned int j);
+
+    void playerLoot();
+    bool playerCastSpell(char direction, unsigned int index);
+    void playerAttack(char direction);
+    void playerAOE(Square effect, unsigned int damage, unsigned int range, int iInc, int jInc);
+    bool playerOpen(char direction);
+    bool playerUse(unsigned int index);
 
     void getBestiary();
     void getItems();
