@@ -210,7 +210,7 @@ int Player::getEquippedWeaponIndex(){
 
 unsigned int Player::getLvl() const{return this->lvl;}
 unsigned int Player::getMaxMP()const{return this->maxMp;}
-int Player::getMP()const{return this->mp;}
+unsigned int Player::getMP()const{return this->mp;}
 unsigned int Player::getExp() const{return this->exp;}
 unsigned int Player::getKeys() const{return this->keys;}
 unsigned int Player::getGp() const{return this->gp;}

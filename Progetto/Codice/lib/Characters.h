@@ -82,7 +82,7 @@ class Player : public Character{
     
     int getEquippedWeaponIndex(); //-1 = none
     unsigned int getLvl() const;
-    int getMP() const;
+    unsigned int getMP() const;
     unsigned int getMaxMP() const;
     unsigned int getExp() const;
     unsigned int getKeys() const;

@@ -444,7 +444,6 @@ void Game::exportMap(){
 
 void Game::printInterface(){
     int y = 0;
-
     for (int i = player->getY() - (MAP_HEIGHT/2); i != player->getY() + (MAP_HEIGHT/2) +1; i++) {
         y++;
 		for (int j = player->getX() - (MAP_WIDTH/2); j != player->getX() + (MAP_WIDTH/2) +1; j++) {
@@ -453,7 +452,7 @@ void Game::printInterface(){
             }else{
                 //Check if Player is in this position
                 if(player->getY() == i && player->getX() == j)
-                    printUnicode(player->getCh());
+                    printUnicode(player->getCh(), 1);
                 else if(fogMatrix[i][j] == true){
                     //Check if an enemy is in this position
                     std::vector<std::unique_ptr<Enemy>>::iterator end = enemies.end();
@@ -461,7 +460,14 @@ void Game::printInterface(){
                     for (std::vector<std::unique_ptr<Enemy>>::iterator it = enemies.begin(); it != end; it++ ){
                         if((**it).getY() == i && (**it).getX() == j){
                             written = true;
-                            printUnicode((*it)->getCh());
+                            if(((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 75)
+                                printUnicode((*it)->getCh(), 2);
+                            else if (((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 50)
+                                printUnicode((*it)->getCh(), 3);
+                            else if (((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 25)
+                                printUnicode((*it)->getCh(), 4);
+                            else
+                                printUnicode((*it)->getCh(), 5);
                         }
                     }
                     //Check if an item is in this position
@@ -469,7 +475,7 @@ void Game::printInterface(){
                     for (std::vector<std::unique_ptr<InventoryElement>>::iterator it = items.begin(); it != end2; it++ ){
                         if((**it).getY() == i && (**it).getX() == j){
                             written = true;
-                            printUnicode((*it)->getCh());
+                            printUnicode((*it)->getCh(), 0);
                         }
                     }
                     //Check if a weapon is in this position
@@ -477,7 +483,7 @@ void Game::printInterface(){
                     for (std::vector<std::unique_ptr<Weapon>>::iterator it = weapons.begin(); it != end3; it++){
                         if((**it).getY() == i && (**it).getX() == j){
                             written = true;
-                            printUnicode((*it)->getCh());
+                            printUnicode((*it)->getCh(), 0);
                         }
                     }
 
@@ -486,7 +492,7 @@ void Game::printInterface(){
                     for (std::vector<std::unique_ptr<Scroll>>::iterator it = scrolls.begin(); it != end4; it++){
                         if((**it).getY() == i && (**it).getX() == j){
                             written = true;
-                            printUnicode((*it)->getCh());
+                            printUnicode((*it)->getCh(), 0);
                         }
                     }
 
@@ -506,9 +512,9 @@ void Game::printInterface(){
                                     for (it; it != end; it++){
                                         if((**it).getY() == i && (**it).getX() == j){
                                             if((**it).isLocked())
-                                                printUnicode((**it).getChLocked());
+                                                printUnicode((**it).getChLocked(), 0);
                                             else
-                                                printUnicode((**it).getChUnlocked());
+                                                printUnicode((**it).getChUnlocked(), 0);
                                             break;
                                         }
                                     }
@@ -516,19 +522,19 @@ void Game::printInterface(){
                                 break;
                             case 2:
                                 //Floor
-                                printUnicode(rooms.at(abs(m[i][j]) - 4)->getChFloor());
+                                printUnicode(rooms.at(abs(m[i][j]) - 4)->getChFloor(), 0);
                                 break;
                             case 3:
                                 //Path
-                                printUnicode(chPath);
+                                printUnicode(chPath, 0);
                                 break;
                             case 4:
                                 //Wall
-                                printUnicode(rooms.at(abs(m[i][j]) - 4)->getChWall());
+                                printUnicode(rooms.at(abs(m[i][j]) - 4)->getChWall(), 0);
                                 break;
                             case 8:
                                 //Exit
-                                printUnicode(this->chExit);
+                                printUnicode(this->chExit, 0);
                                 break;
                             default:
                                 break;
@@ -536,7 +542,7 @@ void Game::printInterface(){
                     }
                 }else{
                     //It's int the fog
-                    printUnicode(chFog);
+                    printUnicode(chFog, 0);
                 }
             }
                           
@@ -553,9 +559,30 @@ void Game::printInterface(){
                     std::cout<<"Level: "<<player->getLvl();
                     break;
                 case 4:
-                    std::cout<<"HP: "<<player->getHP()<<"/"<<player->getMaxHP();
+                    if((player->getHP() * 100)/(player->getMaxHP()) >= 75)
+                        std::cout<<"HP: "<<termcolor::green<<player->getHP()<<"/"<<player->getMaxHP();
+                    else if((player->getHP() * 100)/(player->getMaxHP()) >= 50)
+                        std::cout<<"HP: "<<termcolor::yellow<<player->getHP()<<"/"<<player->getMaxHP();
+                    else if((player->getHP() * 100)/(player->getMaxHP()) >= 25)
+                        std::cout<<"HP: "<<termcolor::magenta<<player->getHP()<<"/"<<player->getMaxHP();
+                    else
+                        std::cout<<"HP: "<<termcolor::red<<player->getHP()<<"/"<<player->getMaxHP();
+                    
                     std::cout<<"    ";
-                    std::cout<<"MP: "<<player->getMP()<<"/"<<player->getMaxMP();
+                    std::cout<<termcolor::reset;
+                    if(player->getMaxMP()){
+                        if((player->getMP() * 100)/(player->getMaxMP()) >= 75)
+                            std::cout<<"MP: "<<termcolor::blue<<player->getMP()<<"/"<<player->getMaxMP();
+                        else if((player->getMP() * 100)/(player->getMaxMP()) >= 50)
+                            std::cout<<"MP: "<<termcolor::yellow<<player->getMP()<<"/"<<player->getMaxMP();
+                        else if((player->getMP() * 100)/(player->getMaxMP()) >= 25)
+                            std::cout<<"MP: "<<termcolor::magenta<<player->getMP()<<"/"<<player->getMaxMP();
+                        else
+                            std::cout<<"MP: "<<termcolor::red<<player->getMP()<<"/"<<player->getMaxMP();
+                    }else{
+                        std::cout<<"MP: "<<termcolor::red<<"0/0";
+                    }
+                    std::cout<<termcolor::reset;
                     break;
                 case 5:
                     std::cout<<"STR: "<<player->getStr();
@@ -591,18 +618,28 @@ void Game::printInterface(){
                 if(y >= 12 && y <= 21){
                     std::cout<<y-12;
                     if(y-12 < player->getInventorySize()){
-                        if(player->getInventoryElementAt(y-12).getIsEquipped())
-                            std::cout<<" E : ";
-                        else
+                        if(player->getInventoryElementAt(y-12).getIsEquipped()){
+                            std::cout<<termcolor::yellow<<" E : ";
+                        }else
                             std::cout<<"   : ";
-                        if(player->getInventoryElementAt(y-12).getIsIdentified())
-                            std::cout<<player->getInventoryElementAt(y-12).getLabel();
-                        else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "herb"))
-                            std::cout<<"Unidentified herb";
+                        if(player->getInventoryElementAt(y-12).getIsIdentified()){
+                            if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "herb"))
+                                std::cout<<termcolor::green<<player->getInventoryElementAt(y-12).getLabel();
+                            else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "potion"))
+                                std::cout<<termcolor::blue<<player->getInventoryElementAt(y-12).getLabel();
+                            else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "weapon"))
+                                std::cout<<termcolor::yellow<<player->getInventoryElementAt(y-12).getLabel();
+                            else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "protection"))
+                                std::cout<<termcolor::white<<player->getInventoryElementAt(y-12).getLabel();
+                            else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "scroll"))
+                                std::cout<<termcolor::magenta<<player->getInventoryElementAt(y-12).getLabel();
+                        }else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "herb"))
+                            std::cout<<termcolor::green<<"Unidentified herb";
                         else
                             std::cout<<"???";
                     }else
                         std::cout<<"   : ";
+                    std::cout<<termcolor::reset;
                 }
                 break;
             }
@@ -1384,10 +1421,12 @@ void Game::moveEnemies(){
             //If player is in attack range, attack it
             if(getDistance((**it), *player) <= (**it).getAttackRange()){
                 this->player->takeDamage((**it).getLabel(), (**it).getAtkDamage());
+                std::cout<<"\n\n"<<(**it).getY()<<"  "<<(**it).getX()<<"  "<<(**it).getAttackRange()<< "   "<<getDistance((**it), *player);
             }
             //If player is in sight range, move towards him
             else if(getDistance((**it), *player) <= (**it).getSightRange()){
-                
+                walkShortestPath(**it, this->player->getX(), this->player->getY());
+                (**it).setNextActTime(this->lapsedTime + (**it).getMovTime());
             }
             //If none, just move randomly
             else{
@@ -1421,7 +1460,7 @@ void Game::moveEnemies(){
 }
 
 unsigned int Game::getDistance(Character& a, Character& b) const{
-    return (abs(a.getX() - b.getX()) + abs(a.getY() - b.getY()));
+    return (abs((int)(a.getX() - b.getX())) + abs(((int)(a.getY() - b.getY()))));
 }
 
 unsigned int Game::getDistance(int x1, int y1, int x2, int y2) const{
@@ -1672,7 +1711,7 @@ bool Game::playerOpen(char direction){
                                 (**it).setLocked(false);
                             }else{
                                 history += "\n" + this->player->getLabel() + " failed to open a door.";
-                                this->player->takeDamage("Door", abs(result)/2);
+                                this->player->takeDamage("Door", abs((int)(result)/2));
                             }
                             return true;
                         }else
@@ -1844,7 +1883,32 @@ void Game::getItems(){
     }
 }
 
-void Game::printUnicode(std::string character) const{
+void Game::printUnicode(std::string character, unsigned int color) const{
+    switch (color)
+    {
+    case 1:
+        //Player green
+        std::cout<<termcolor::green;
+        break;
+    case 2:
+        //High health enemy
+        std::cout <<termcolor::blue;
+        break;
+    case 3:
+        //Mid high health enemy
+        std::cout<<termcolor::magenta;
+        break;
+    case 4:
+        //Mid low health enemy
+        std::cout<<termcolor::yellow;
+        break;
+    case 5:
+        //Low health enemy
+        std::cout<<termcolor::red;
+        break;
+    default:
+        break;
+    }
     int dec = (int)strtol(character.c_str(), NULL, 16);
     if(dec < 128){
         //1 byte
@@ -1973,4 +2037,403 @@ void Game::printUnicode(std::string character) const{
             break;
         }
     }
+
+    std::cout << termcolor::reset;
 }
+
+void Game::printRange(std::vector<Square> areasOfEffect){
+    int y = 0;
+    for (int i = player->getY() - (MAP_HEIGHT/2); i != player->getY() + (MAP_HEIGHT/2) +1; i++) {
+        y++;
+		for (int j = player->getX() - (MAP_WIDTH/2); j != player->getX() + (MAP_WIDTH/2) +1; j++) {
+            if(j < 0 || i < 0 || j > MAX_MATRIX_WIDTH || i > MAX_MATRIX_HEIGHT){
+                std::cout<<" ";
+            }else{
+                //Check if Player is in this position
+                if(player->getY() == i && player->getX() == j)
+                    printUnicode(player->getCh(), 1);
+                else if(fogMatrix[i][j] == true){
+                    //Check if an enemy is in this position
+                    std::vector<std::unique_ptr<Enemy>>::iterator end = enemies.end();
+                    bool written = false;
+                    for (std::vector<std::unique_ptr<Enemy>>::iterator it = enemies.begin(); it != end; it++ ){
+                        if((**it).getY() == i && (**it).getX() == j){
+                            written = true;
+                            if(((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 75)
+                                printUnicode((*it)->getCh(), 2);
+                            else if (((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 50)
+                                printUnicode((*it)->getCh(), 3);
+                            else if (((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 25)
+                                printUnicode((*it)->getCh(), 4);
+                            else
+                                printUnicode((*it)->getCh(), 5);
+                        }
+                    }
+                    //Check if an item is in this position
+                    std::vector<std::unique_ptr<InventoryElement>>::iterator end2 = items.end();
+                    for (std::vector<std::unique_ptr<InventoryElement>>::iterator it = items.begin(); it != end2; it++ ){
+                        if((**it).getY() == i && (**it).getX() == j){
+                            written = true;
+                            printUnicode((*it)->getCh(), 0);
+                        }
+                    }
+                    //Check if a weapon is in this position
+                    std::vector<std::unique_ptr<Weapon>>::iterator end3 = weapons.end();
+                    for (std::vector<std::unique_ptr<Weapon>>::iterator it = weapons.begin(); it != end3; it++){
+                        if((**it).getY() == i && (**it).getX() == j){
+                            written = true;
+                            printUnicode((*it)->getCh(), 0);
+                        }
+                    }
+
+                    //Check if a scroll is in this position
+                    std::vector<std::unique_ptr<Scroll>>::iterator end4 = scrolls.end();
+                    for (std::vector<std::unique_ptr<Scroll>>::iterator it = scrolls.begin(); it != end4; it++){
+                        if((**it).getY() == i && (**it).getX() == j){
+                            written = true;
+                            printUnicode((*it)->getCh(), 0);
+                        }
+                    }
+
+                    //Check if it's a map element
+                    if(!written){
+                        switch (getElementType(i, j)){
+                            case 0:
+                            //Nothing
+                                std::cout<<" ";
+                                break;
+                            case 1:
+                                //Door
+                                {
+                                    std::vector<std::unique_ptr<Door>>::iterator end = rooms.at(abs(m[i][j]) - 4)->doors.end();
+                                    std::vector<std::unique_ptr<Door>>::iterator it = rooms.at(abs(m[i][j]) - 4)->doors.begin();
+                                    //Iterate over every door of the connected room to check if it is the right one
+                                    for (it; it != end; it++){
+                                        if((**it).getY() == i && (**it).getX() == j){
+                                            if((**it).isLocked())
+                                                printUnicode((**it).getChLocked(), 0);
+                                            else
+                                                printUnicode((**it).getChUnlocked(), 0);
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            case 2:
+                                //Floor
+                                printUnicode(rooms.at(abs(m[i][j]) - 4)->getChFloor(), 0);
+                                break;
+                            case 3:
+                                //Path
+                                printUnicode(chPath, 0);
+                                break;
+                            case 4:
+                                //Wall
+                                printUnicode(rooms.at(abs(m[i][j]) - 4)->getChWall(), 0);
+                                break;
+                            case 8:
+                                //Exit
+                                printUnicode(this->chExit, 0);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }else{
+                    //It's int the fog
+                    printUnicode(chFog, 0);
+                }
+            }
+                          
+		}
+        std::cout<<"   ";
+        switch (y){
+                case 1:
+                    std::cout<<"Name: "<<player->getLabel();
+                    break;
+                case 2:
+                    std::cout<<"Class: "<<player->getPlayerClass();
+                    break;
+                case 3:
+                    std::cout<<"Level: "<<player->getLvl();
+                    break;
+                case 4:
+                    std::cout<<"HP: "<<player->getHP()<<"/"<<player->getMaxHP();
+                    std::cout<<"    ";
+                    std::cout<<"MP: "<<player->getMP()<<"/"<<player->getMaxMP();
+                    break;
+                case 5:
+                    std::cout<<"STR: "<<player->getStr();
+                    std::cout<<"    ";
+                    std::cout<<"DEX: "<<player->getDex();
+                    std::cout<<"    ";
+                    std::cout<<"MND: "<<player->getMnd();
+                    std::cout<<"    ";
+                    std::cout<<"WIS: "<<player->getWis();
+                    break;
+                case 6:
+                    std::cout<<"ActTime: "<<player->getActTime();
+                    std::cout<<"    ";
+                    std::cout<<"MovTime: "<<player->getMovTime();
+                    std::cout<<"    ";
+                    std::cout<<"Res: "<<player->getRes();
+                    break;
+                case 7:
+                    std::cout<<"Exp: "<<player->getExp()<<"/"<<player->getLvl()*100;
+                    break;
+                case 8:
+                    std::cout<<"GP: "<<player->getGp();
+                    std::cout<<"    ";
+                    std::cout<<"Keys: "<<player->getKeys();
+                    break;
+                case 9:
+                    std::cout<<"LapsedTime: "<<lapsedTime;
+                    break;
+                case 11:
+                    std::cout<<"Inventory";
+                    break;
+            default:
+                if(y >= 12 && y <= 21){
+                    std::cout<<y-12;
+                    if(y-12 < player->getInventorySize()){
+                        if(player->getInventoryElementAt(y-12).getIsEquipped())
+                            std::cout<<" E : ";
+                        else
+                            std::cout<<"   : ";
+                        if(player->getInventoryElementAt(y-12).getIsIdentified())
+                            std::cout<<player->getInventoryElementAt(y-12).getLabel();
+                        else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "herb"))
+                            std::cout<<"Unidentified herb";
+                        else
+                            std::cout<<"???";
+                    }else
+                        std::cout<<"   : ";
+                }
+                break;
+            }
+		std::cout << std::endl;
+	}
+}
+
+void Game::checkBox(std::shared_ptr<Box> current, std::shared_ptr<Box> temp, std::vector<std::shared_ptr<Box>>& openList, std::vector<std::shared_ptr<Box>>& closedList, unsigned int targetX, unsigned int targetY){
+    //Check if temp is in the closedList
+    bool closed = false;
+    std::vector<std::shared_ptr<Box>>::iterator it = closedList.begin();
+    std::vector<std::shared_ptr<Box>>::iterator end = closedList.end();
+    for(it; it != end; it ++){
+        //If the square is in the closedList...
+        if((**it).getX() == temp->getX() && (**it).getY() == temp->getY()){
+             //Don't add it to the openList
+            closed = true;
+        }
+    }
+
+    if(!closed){
+        //Check if temp is in the openList
+        bool open = false;
+        it = openList.begin();
+        end = openList.end();
+        for(it; it != end; it ++){
+            //If the square is in the openList...
+            if((**it).getX() == temp->getX() && (**it).getY() == temp->getY()){
+                open = true;
+                unsigned int newGScore = current->getG() + 1;
+                unsigned int newHScore = getDistance(temp->getX(), temp->getY(), targetX, targetY);
+                if(newGScore + newHScore < (**it).getG() + (**it).getH()){
+                    (**it).setG(newGScore);
+                    (**it).setH(newHScore);
+                    std::shared_ptr<Box> t = (current->getPreviousBox()); 
+                    (**it).setPreviousBox(t); 
+                }
+            }
+        }
+        if(!open){
+            openList.push_back(temp);
+        }
+    }
+}
+
+void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int targetY){
+    bool found = false;
+    //Create open list
+    std::vector<std::shared_ptr<Box>> openList;
+    //Create closed list
+    std::vector<std::shared_ptr<Box>> closedList;
+    //Set the current square
+    std::shared_ptr<Box> current = std::make_shared<Box> (Box(c.getX(), c.getY(), 0, 0));
+    while(true){
+        //TEMP INIZIO
+        /*for (int i = player->getY() - (MAP_HEIGHT/2); i != player->getY() + (MAP_HEIGHT/2) +1; i++) {
+            for (int j = player->getX() - (MAP_WIDTH/2); j != player->getX() + (MAP_WIDTH/2) +1; j++) {
+                if(j < 0 || i < 0 || j > MAX_MATRIX_WIDTH || i > MAX_MATRIX_HEIGHT){
+                    std::cout<<" ";
+                }else{
+                    //Check if Player is in this position
+                    if(player->getY() == i && player->getX() == j)
+                        printUnicode(player->getCh(), 1);
+                    else if(!isWalkable(j, i))
+                        std::cout<<"X";
+                    else{
+                        std::vector<std::shared_ptr<Box>>::iterator it = openList.begin();
+                        std::vector<std::shared_ptr<Box>>::iterator end = openList.end();
+                        bool written = false;
+                        for(it; it != end; it ++){
+                            if((**it).getX() == j && (**it).getY() == i){
+                                written = true;
+                                std::cout<<termcolor::green<<"."<<termcolor::reset;
+                            }
+                        }
+                        it = closedList.begin();
+                        end = closedList.end();
+                        for(it; it != end; it ++){
+                            if((**it).getX() == j && (**it).getY() == i){
+                                written = true;
+                                std::cout<<termcolor::red<<"."<<termcolor::reset;
+                            }
+                        }
+                        
+                        
+                        if(!written)
+                            std::cout<<".";
+                    }
+                }
+            }
+            std::cout<<std::endl;
+        }
+        */
+        //TEMP FINE
+        //Add the walkable squares to the open list if necessary
+        //Upper square
+        //Check if the target is in the open list
+        //std::cout<<"\n\nROSSO: "<<current->getX()<<"   "<<current->getY();
+        //std::cout<<"\n\nCURRENT: "<<current->getX()<<"   "<<current->getY() - 1;
+        //std::cout<<"\nTARGET: "<<targetX<<","<<targetY<<"\n\n";
+        if(current->getX() == targetX && current->getY() - 1 == targetY){
+            found = true;
+            //std::cout<<"eccolo";
+            break;
+        }
+        if(isWalkable(current->getX(), current->getY() - 1)){
+            std::shared_ptr<Box> temp = std::make_shared<Box>(Box(current->getX(), current->getY() - 1, current->getG() + 1, getDistance(current->getX(), current->getY() - 1, targetX, targetY)));
+            //Set previous box
+            temp->setPreviousBox(current);
+            //std::cout<<"\n\n"<<temp->getPreviousBox()->getX();
+            
+            checkBox(current, temp, openList, closedList, targetX, targetY);
+        }
+        //Lower square
+        //Check if the target is in the open list
+        //std::cout<<"\n\nCURRENT: "<<current->getX()<<"   "<<current->getY() + 1;
+        //std::cout<<"\nTARGET: "<<targetX<<","<<targetY<<"\n\n";
+        if(current->getX() == targetX && current->getY() + 1 == targetY){
+            found = true;
+            //std::cout<<"eccolo";
+            break;
+        }
+        if(isWalkable(current->getX(), current->getY() + 1)){
+            std::shared_ptr<Box> temp = std::make_shared<Box>(Box(current->getX(), current->getY() + 1, current->getG() + 1, getDistance(current->getX(), current->getY() + 1, targetX, targetY)));
+            //Set previous box
+            temp->setPreviousBox(current);
+            //std::cout<<"\n\n"<<temp->getPreviousBox()->getX();
+            //Check if the target is in the open list
+            checkBox(current, temp, openList, closedList, targetX, targetY);
+        }
+        //Right square
+        //Check if the target is in the open list
+        //std::cout<<"\n\nCURRENT: "<<current->getX() + 1<<"   "<<current->getY();
+        //std::cout<<"\nTARGET: "<<targetX<<","<<targetY<<"\n\n";
+        if(current->getX() + 1 == targetX && current->getY() == targetY){
+            found = true;
+            //std::cout<<"eccolo";
+            break;
+        }
+        if(isWalkable(current->getX() + 1, current->getY())){
+            std::shared_ptr<Box> temp = std::make_shared<Box>(Box(current->getX() + 1, current->getY(), current->getG() + 1, getDistance(current->getX() + 1, current->getY(), targetX, targetY)));
+            //Set previous box
+            temp->setPreviousBox(current);
+            //std::cout<<"\n\n"<<temp->getPreviousBox()->getX();
+            //Check if the target is in the open list
+            checkBox(current, temp, openList, closedList, targetX, targetY);
+        }
+        //Left square
+        //Check if the target is in the open list
+        //std::cout<<"\n\nCURRENT: "<<current->getX() - 1<<"   "<<current->getY();
+        //std::cout<<"\nTARGET: "<<targetX<<","<<targetY<<"\n\n";
+        if(current->getX() - 1 == targetX && current->getY() == targetY){
+            found = true;
+            //std::cout<<"eccolo";
+            break;
+        }
+        if(isWalkable(current->getX() - 1, current->getY())){
+            std::shared_ptr<Box> temp = std::make_shared<Box>(Box(current->getX() - 1, current->getY(), current->getG() + 1, getDistance(current->getX() - 1, current->getY(), targetX, targetY)));
+            //Set previous box
+            temp->setPreviousBox(current);
+            //Check if the target is in the open list
+            checkBox(current, temp, openList, closedList, targetX, targetY);
+        }
+
+        //Find the box with the lower F score
+        std::vector<std::shared_ptr<Box>>::iterator it = openList.begin();
+        std::vector<std::shared_ptr<Box>>::iterator end = openList.end();
+        unsigned int minG = (**it).getG();
+        unsigned int minH = (**it).getH();
+        unsigned int minIndex = 0;
+        for(it; it != end; it ++){
+            //If the F score of the current element is lower...
+            if((**it).getG() + (**it).getH() < minG + minH){
+                minG = (**it).getG();
+                minH = (**it).getH();
+                minIndex = it - openList.begin();
+            }else if((**it).getG() + (**it).getH() == minG + minH){
+                if((**it).getH() < minH){
+                    minG = (**it).getG();
+                    minH = (**it).getH();
+                    minIndex = it - openList.begin();
+                }
+            }
+        }
+        if(openList.size() == 0)
+            break;
+        //Add the box with the lower F score to the closed list
+        closedList.push_back(std::make_shared<Box>(Box(openList.at(minIndex)->getX(), openList.at(minIndex)->getY(), openList.at(minIndex)->getG(), openList.at(minIndex)->getH())));
+        closedList.back()->setPreviousBox(openList.at(minIndex)->getPreviousBox());
+        //Set the current box
+        current = closedList.back();
+        //Remove the current box from the open list
+        openList.erase(openList.begin() + minIndex);
+    }
+
+    //If the path has been found...
+    if(found){
+        //Iterate backwards to find where it started
+        std::shared_ptr<Box> p = current->getPreviousBox();
+        while(p->getPreviousBox()->getPreviousBox() != nullptr){
+            p = p->getPreviousBox();
+        }
+        c.setCoordinates(p->getX(), p->getY());
+    }else{
+        //Else there is no path, the character won't move for now
+        std::cout<<"\n\nNot found :(\n\n";
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------
+
+//BOX SECTION
+Box::Box(unsigned int x, unsigned int y, unsigned int g, unsigned int h){
+    this->x = x;
+    this->y = y;
+    this->g = g;
+    this->h = h;
+}
+
+unsigned int Box::getX() const{return this->x;}
+unsigned int Box::getY() const{return this->y;}
+unsigned int Box::getG() const{return this->g;}
+unsigned int Box::getH() const{return this->h;}
+std::shared_ptr<Box> Box::getPreviousBox() const{return this->previousBox;}
+
+void Box::setG(unsigned int g){this->g = g;}
+void Box::setH(unsigned int h){this->h = h;}
+void Box::setPreviousBox(std::shared_ptr<Box> pBox){this->previousBox = pBox;}

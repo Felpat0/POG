@@ -163,7 +163,8 @@ int main(){
         if(game.getPlayer()->getX() == game.getExitX() &&  game.getPlayer()->getY() == game.getExitY()){
             gameState = 2;
             break;
-        }
+        } 
+            std::cout<<"\nI:"<<game.getPlayer()->getY()<<" J:"<<game.getPlayer()->getX()<<"\n\n";
         game.moveEnemies();
         //Check if the player died after the enemy moves
         if(game.getPlayer()->getHP() == 0){

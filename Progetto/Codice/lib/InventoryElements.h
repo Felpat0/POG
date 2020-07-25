@@ -11,6 +11,7 @@
 
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_print.hpp"
+#include "Termcolor/termcolor.hpp"
 
 //MAX_X_VALUE = MAX_MATRIX_WIDTH - MAX_ROOM_WIDTH -1
 #define ROOMS_NUMBER 20

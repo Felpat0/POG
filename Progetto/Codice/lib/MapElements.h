@@ -2,6 +2,28 @@
 #define _ELEMENTS_H
 #include "Characters.h"
 
+
+class Box{
+    private:
+    unsigned int x;
+    unsigned int y;
+    unsigned int g;
+    unsigned int h;
+    std::shared_ptr<Box> previousBox;
+
+    public:
+    Box(unsigned int x, unsigned int y, unsigned int g, unsigned int h);
+    unsigned int getX() const;
+    unsigned int getY() const;
+    unsigned int getG() const;
+    unsigned int getH() const;
+    std::shared_ptr<Box> getPreviousBox() const;
+
+    void setG(unsigned int g);
+    void setH(unsigned int h);
+    void setPreviousBox(std::shared_ptr<Box> pBox);
+};
+
 class Door{
     private:
     std::string roomLabel;
@@ -128,7 +150,11 @@ class Game{
     void getBestiary();
     void getItems();
 
-    void printUnicode(std::string character) const;
-    
+    void printUnicode(std::string character, unsigned int color) const;
+    void printRange(std::vector<Square> areasOfEffect);
+
+    void checkBox(std::shared_ptr<Box> current, std::shared_ptr<Box> temp, std::vector<std::shared_ptr<Box>>& openList, std::vector<std::shared_ptr<Box>>& closedList, unsigned int targetX, unsigned int targetY);
+    void walkShortestPath(Character& c, unsigned int targetX, unsigned int targetY);
 };
+
 #endif
