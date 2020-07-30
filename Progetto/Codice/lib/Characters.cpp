@@ -50,6 +50,7 @@ float Character::getStat(std::string stat) const{
         return this->movTime;
     else if(areStringsEqual(stat, "actT"))
         return this->actTime;
+    return 0;
 }
 int Character::abilityCheck(std::string stat, unsigned int cd){
     int random = (rand() % 20) + 1;
@@ -89,34 +90,71 @@ bool Character::takeDamage(std::string attackerLabel, unsigned int damage){ //Fa
 void Character::healDamage(unsigned int heal){
     hp += heal;
     if(hp > maxHp){
-        std::cout<<"\n"<<this->label<<" healed for "<<heal - (hp - maxHp)<<" hp";
+        history += "\n" + this->label + " healed for " + std::to_string((int)(heal - (hp - maxHp))) + " hp";
         hp = maxHp;
     }else
-        std::cout<<"\n"<<this->label<<" healed for "<<heal<<" hp";
+        history += "\n" + this->label + " healed for " + std::to_string((int)(heal)) + " hp";
 }
 
 void Character::applySelfEffect(SelfEffect e){
-    if(areStringsEqual(e.getStat(), "hp"))
-        this->healDamage((this->getStat(e.getPotStat())) * e.getPot());
-    else if(areStringsEqual(e.getStat(), "maxHp")){
+    int value = (int)((this->getStat(e.getPotStat())) * e.getPot());
+    if(areStringsEqual(e.getStat(), "hp")){
+        if(value > 0)
+            this->healDamage(value);
+        else if(value < 0)
+            this->takeDamage("Effect", abs(value));
+    }else if(areStringsEqual(e.getStat(), "maxHp")){
         //If the player has full health, his current hp raise with the maxHp
         if(this->maxHp == this->hp)
-            this->hp += (this->getStat(e.getPotStat())) * e.getPot();
-        this->maxHp += (this->getStat(e.getPotStat())) * e.getPot();
-    }else if(areStringsEqual(e.getStat(), "str"))
-        this->str += (this->getStat(e.getPotStat())) * e.getPot();
-    else if(areStringsEqual(e.getStat(), "dex"))
-        this->dex += (this->getStat(e.getPotStat())) * e.getPot();
-    else if(areStringsEqual(e.getStat(), "mnd"))
-        this->mnd += (this->getStat(e.getPotStat())) * e.getPot();
-    else if(areStringsEqual(e.getStat(), "wis"))
-        this->wis += (this->getStat(e.getPotStat())) * e.getPot();
-    else if(areStringsEqual(e.getStat(), "res"))
-        this->res += (this->getStat(e.getPotStat())) * e.getPot();
-    else if(areStringsEqual(e.getStat(), "movT"))
-        this->movTime += (this->getStat(e.getPotStat())) * e.getPot();
-    else if(areStringsEqual(e.getStat(), "actT"))
-        this->actTime += (this->getStat(e.getPotStat())) * e.getPot();
+            this->hp += value;
+        this->maxHp += value;
+        history += "\nMax hp of " + this->getLabel() + ": ";
+        if(value > 0)
+            history += "+";
+        history += std::to_string(value);
+    }else if(areStringsEqual(e.getStat(), "str")){
+        this->str += value;
+        history += "\nStrength (STR) of " + this->getLabel() + ": ";
+        if(value > 0)
+            history += "+";
+        history += std::to_string(value);
+    }else if(areStringsEqual(e.getStat(), "dex")){
+        this->dex += value;
+        history += "\nDexterity (DEX) of " + this->getLabel() + ": ";
+        if(value > 0)
+            history += "+";
+        history += std::to_string(value);
+    }else if(areStringsEqual(e.getStat(), "mnd")){
+        this->mnd += value;
+        history += "\nMind (MND) of " + this->getLabel() + ": ";
+        if(value > 0)
+            history += "+";
+        history += std::to_string(value);
+    }else if(areStringsEqual(e.getStat(), "wis")){
+        this->wis += value;
+        history += "\nWisdom (WIS) of " + this->getLabel() + ": ";
+        if(value > 0)
+            history += "+";
+        history += std::to_string(value);
+    }else if(areStringsEqual(e.getStat(), "res")){
+        this->res += value;
+        history += "\nResistance (RES) of " + this->getLabel() + ": ";
+        if(value > 0)
+            history += "+";
+        history += std::to_string(value);
+    }else if(areStringsEqual(e.getStat(), "movT")){
+        this->movTime += value;
+        history += "\nMove time (MovTime) of " + this->getLabel() + ": ";
+        if(value > 0)
+            history += "+";
+        history += std::to_string(value);
+    }else if(areStringsEqual(e.getStat(), "actT")){
+        this->actTime += value;
+        history += "\nAct time of " + this->getLabel() + ": ";
+        if(value > 0)
+            history += "+";
+        history += std::to_string(value);
+    }
 }
 
 void Character::applyEffect(Effect e){
@@ -235,7 +273,7 @@ int Player::input(std::string command){
         //Move
         setMovementIntention(command);
         return 1;
-    }else if(command.length() == 7 && command.substr(0, 5) == "equip" && isdigit(command[6])){
+    }else if(command.length() == 7 && areStringsEqual(command.substr(0, 5), "equip") && isdigit(command[6])){
         //Equip
         return 2;
     }else if(command.length() == 5 && areStringsEqual(command.substr(0, 3), "atk") ){
@@ -253,13 +291,13 @@ int Player::input(std::string command){
             //Cast spell
             return 4;
         }
-    }else if(command.length() == 4 && command.substr(0, 4) == "take"){
+    }else if(command.length() == 4 && areStringsEqual(command.substr(0, 4), "take")){
         //Loot items
         return 6;
-    }else if(command.length() == 9 && command.substr(0, 7) == "discard" && isdigit(command[8])){
+    }else if(command.length() == 9 && areStringsEqual(command.substr(0, 7), "discard") && isdigit(command[8])){
         //Discard item
         return 7;
-    }else if(command.length() == 10 && command.substr(0, 8) == "identify" && isdigit(command[9])){
+    }else if(command.length() == 10 && areStringsEqual(command.substr(0, 8), "identify") && isdigit(command[9])){
         //Identify item
         return 8;
     }else if(command.length() == 6 && areStringsEqual(command.substr(0, 4), "open") ){
@@ -267,6 +305,12 @@ int Player::input(std::string command){
         || areStringsEqual("s", std::string(1, command[5])) || areStringsEqual("d", std::string(1, command[5]))){
             //Open door/chest
             return 9;
+        }
+    }else if(command.length() == 9 && areStringsEqual(command.substr(0, 5), "range") && isdigit(command[6])){
+        if(areStringsEqual("w", std::string(1, command[8])) || areStringsEqual("a", std::string(1, command[8]))
+        || areStringsEqual("s", std::string(1, command[8])) || areStringsEqual("d", std::string(1, command[8]))){
+            //Range objectIndex w/a/s/d
+            return 10;
         }
     }
     return 0;
@@ -358,6 +402,20 @@ bool Player::disequipItem(unsigned int index){
 }
 
 bool Player::equipItem(unsigned int index){
+    //If the index is not valid, return false
+    if(index >= inventoryElements.size()){
+        std::cout<<"\nThere is no item at this index. Press enter to continue.\n";
+        fflush(stdin);
+        std::cin.ignore();
+        return false;
+    }
+    //If the item has not been identified, return false
+    if(!this->inventoryElements.at(index)->getIsIdentified()){
+        std::cout<<"\nThis item has to be identified first. Press enter to continue.\n";
+        fflush(stdin);
+        std::cin.ignore();
+        return false;
+    }
     //If the item is already equipped or can't be equipped, return false
     if(this->inventoryElements.at(index)->getIsEquipped() || (!areStringsEqual(this->inventoryElements.at(index)->getType(), "weapon") && !areStringsEqual(this->inventoryElements.at(index)->getType(), "protection"))){
         std::cout<<"\nThe chosen item is already equipped or can't be equipped. Press enter to continue.\n";
@@ -491,6 +549,8 @@ std::vector<Effect> Player::getEquippedWeaponEffects(){
         if((**it).getIsEquipped() && areStringsEqual((**it).getType(), "weapon"))
             return (**it).getEffects();
     }
+    std::vector<Effect> temp;
+    return temp;
 }
 
 std::vector<Square> Player::getEquippedWeaponAOE(){
@@ -507,7 +567,58 @@ std::vector<Square> Player::getEquippedWeaponAOE(){
 
 std::vector<Square> Player::getScrollAOEAt(unsigned int index){return (static_cast<Scroll*>(&(*inventoryElements.at(index)))->getAreasOfEffect());}
 
-std::vector<SelfEffect> Player::getScrollSelfEffectsAt(unsigned int index){return (static_cast<Scroll*>(&(*inventoryElements.at(index)))->getSelfEffects());
+std::vector<SelfEffect> Player::getScrollSelfEffectsAt(unsigned int index){return (static_cast<Scroll*>(&(*inventoryElements.at(index)))->getSelfEffects());}
+
+void Player::applyEffect(Effect e){
+    if(areStringsEqual(e.getStat(), "mp") || areStringsEqual(e.getStat(), "maxMp")){
+        int value = (int) e.getValue();
+        if(areStringsEqual(e.getStat(), "mp")){
+            this->mp += value;
+            if(this->mp > this->maxMp)
+                this->mp = this->maxMp;
+            history += "\nMana points (MP) of " + this->getLabel() + ": ";
+            if(value > 0)
+                history += "+";
+            history += std::to_string(value);
+        }else if(areStringsEqual(e.getStat(), "maxMp")){
+            //If the player has full mana, his current mana raise with the maxMp
+            if(this->maxMp == this->mp)
+                this->mp += value;
+            this->maxMp += value;
+            history += "\nMax mana points (MaxMP) of " + this->getLabel() + ": ";
+            if(value > 0)
+                history += "+";
+            history += std::to_string(value);
+        }
+    }else{
+        Character::applyEffect(e);
+    }
+}
+
+void Player::applySelfEffect(SelfEffect e){
+    if(areStringsEqual(e.getStat(), "mp") || areStringsEqual(e.getStat(), "maxMp")){
+        int value = (int)((this->getStat(e.getPotStat())) * e.getPot());
+        if(areStringsEqual(e.getStat(), "mp")){
+            this->mp += value;
+            if(this->mp > this->maxMp)
+                this->mp = this->maxMp;
+            history += "\nMana points (MP) of " + this->getLabel() + ": ";
+            if(value > 0)
+                history += "+";
+            history += std::to_string(value);
+        }else if(areStringsEqual(e.getStat(), "maxMp")){
+            //If the player has full mana, his current mana raise with the maxMp
+            if(this->maxMp == this->mp)
+                this->mp += value;
+            this->maxMp += value;
+            history += "\nMax mana points (MaxMP) of " + this->getLabel() + ": ";
+            if(value > 0)
+                history += "+";
+            history += std::to_string(value);
+        }
+    }else{
+        Character::applySelfEffect(e);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -516,13 +627,14 @@ std::vector<SelfEffect> Player::getScrollSelfEffectsAt(unsigned int index){retur
 Enemy::Enemy(unsigned int x, unsigned int y, unsigned int maxHP, float str, 
     float dex, float mnd, float wis, float res, 
     float movTime, float actTime, std::string attackStat, unsigned int attackRange, unsigned int sightRange, unsigned int exp, unsigned int gp, std::string label, std::string ch) : Character(x, y, maxHP, str, dex, mnd, wis, res, movTime, actTime, ch){
-        this->nextActTime = 0;     
-        this->attackStat = attackStat;
-        this->attackRange = attackRange;
-        this->sightRange = sightRange;
-        this->exp = exp;
-        this->gp = gp;
-        this->label = label;
+    this->nextActTime = 0;     
+    this->attackStat = attackStat;
+    this->attackRange = attackRange;
+    this->sightRange = sightRange;
+    this->exp = exp;
+    this->gp = gp;
+    this->label = label;
+    this->hasAttackedLastTurn = false;
 }
 
 Enemy::Enemy(const Enemy& e, unsigned int x, unsigned int y) : Character(x, y, e.getMaxHP(), e.getStr(), e.getDex(), e.getMnd(), e.getWis(), e.getRes(), e.getMovTime(), e.getActTime(), e.getCh()){
@@ -533,11 +645,13 @@ Enemy::Enemy(const Enemy& e, unsigned int x, unsigned int y) : Character(x, y, e
     this->exp = e.getExp();
     this->gp = e.getGp();
     this->label = e.getLabel();
+    this->hasAttackedLastTurn = false;
 }
 
+void Enemy::setNextActTime(float nextActTime){this->nextActTime = nextActTime;}
+void Enemy::setHasAttackedLastTurn(bool hasAttackedLastTurn){this->hasAttackedLastTurn= hasAttackedLastTurn;}
 
 float Enemy::getNextActTime() const{return this->nextActTime;}
-void Enemy::setNextActTime(float nextActTime){this->nextActTime = nextActTime;}
 std::string Enemy::getAttackStat() const{return this->attackStat;}
 unsigned int Enemy::getAtkDamage(){
     if(areStringsEqual(this->attackStat, "str"))
@@ -548,8 +662,10 @@ unsigned int Enemy::getAtkDamage(){
         return (int)this->mnd;
     else if(areStringsEqual(this->attackStat, "wis"))
         return (int)this->wis;
+    return 0;
 }
 unsigned int Enemy::getAttackRange() const{return this->attackRange;}
 unsigned int Enemy::getSightRange() const{return this->sightRange;}
 unsigned int Enemy::getExp() const{return this->exp;}
 unsigned int Enemy::getGp() const{return this->gp;}
+bool Enemy::getHasAttackedLastTurn() const{return this->hasAttackedLastTurn;}

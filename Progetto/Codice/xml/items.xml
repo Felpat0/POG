@@ -2,12 +2,15 @@
 <items>
     <protection label="Leather Armor" ch="0x00BF">
         <effect stat="maxHp" value="5.0" />
-        <effect stat="res" value="2.0" />
+        <effect stat="res" value="1.0" />
     </protection>
-
 
     <potion label="Healing Potion" ch="0x00BF">
         <effect stat="hp" value="10.0" />
+    </potion>
+
+    <potion label="Mana Potion" ch="0x00BF">
+        <effect stat="mp" value="10.0" />
     </potion>
 
     <potion label="Strength Potion" ch="0x00BF">
@@ -123,7 +126,6 @@
             <square fd="1.0" rd="-1.0" stat="mnd" pot="0.6" /> 
             <square fd="-1.0" rd="0.0" stat="mnd" pot="0.6" /> 
             <square fd="0.0" rd="0.0" stat="mnd" pot="0.6" /> 
-            <square fd="1.0" rd="0.0" stat="mnd" pot="0.6" /> 
             <square fd="-1.0" rd="0.0" stat="mnd" pot="0.6" /> 
             <square fd="1.0" rd="0.0" stat="mnd" pot="0.6" /> 
             <square fd="-1.0" rd="1.0" stat="mnd" pot="0.6" /> 

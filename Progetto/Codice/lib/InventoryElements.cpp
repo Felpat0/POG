@@ -198,7 +198,7 @@ std::string Scroll::getDescription(){
         std::vector<SelfEffect>::iterator end = this->selfEffects.end();
         description += "\nThe scroll has the following self effects:";
         for(it; it != end; it++){
-            description += "\nStat: " + (*it).getStat() + "   Bonus/malus: " + std::to_string((*it).getPot()) + " (+" + (*it).getPotStat() + ")";
+            description += "\nStat: " + (*it).getStat() + "   Bonus/malus: " + std::to_string((int)((*it).getPot())) + " (+" + (*it).getPotStat() + ")";
         }
     }
 

@@ -1,6 +1,6 @@
 #include "Lib/MapElements.h"
 #include <Windows.h>
-
+#include <limits>
 
 unsigned int gameState;
 using namespace std;
@@ -13,16 +13,26 @@ int main(){
     int a = 0;
     while(a != 1 && a != 2){
         cout<<"1.Generate map\n2.Import map and play\n";
-        cin>>a;
-        if(a != 1 && a != 2)
-            std::cout<<"\nInsert a valid input\n";
+        std::cin>>a;
+        while(std::cin.fail() || (a != 1 && a != 2)){
+            std::cin.clear();
+            std::cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            std::cout<<"\nInsert a valid input: ";
+            cin>>a;
+        }
     }
     if(a == 1){
         game.generateMap();
+        std::cout<<"\n";
         return 0;
     }else if(a == 2){
+        std::cout<<"\nImporting map...";
         game.initMap();
+        std::cout<<"\nDone!\nLinking rooms...";
         game.linkRoomsByDoors();
+        std::cout<<"\nDone!\nClearing unused doors...";
+        game.clearUnusedDoors();
+        std::cout<<"\nDone!\n";
         game.chooseClass();
     }
 
@@ -35,6 +45,7 @@ int main(){
     //system("cls");
     while(gameState == 0){
         do{
+            std::cout<<"\n1\n";
             //Clear the fog around the player
             game.clearFog();
             std::cout<<"\nI:"<<game.getPlayer()->getY()<<" J:"<<game.getPlayer()->getX()<<"\n\n";
@@ -44,10 +55,14 @@ int main(){
             }catch(int a){
                 std::cout<<"\nThe input is not valid\n";
             }
+            std::cout<<"\n2\n";
             //system("cls");
+            std::cout<<"\n3\n";
             actionType = game.getPlayer()->input(choice);
+            std::cout<<"\n4\n";
             //If the user inserted a valid action
             if(actionType != 0){
+                std::cout<<"\n5\n";
                 error = 0;
                 switch (actionType){
                     case 1: 
@@ -127,6 +142,26 @@ int main(){
                         if(game.playerOpen(choice[5]))
                             game.lapsedTime += game.getPlayer()->getActTime();
                         break;
+                    case 10:
+                        //Show object range
+                        if(choice[6] - '0' >= game.getPlayer()->getInventorySize()){
+                            std::cout<<"\nThe index is not valid. Press enter to continue.\n";
+                            fflush(stdin);
+                            cin.ignore();
+                        }else if(!game.getPlayer()->getInventoryElementAt(choice[6] - '0').getIsIdentified()){
+                            std::cout<<"\nThis item has to be identified first. Press enter to continue.\n";
+                            fflush(stdin);
+                            cin.ignore();
+                        }else if(areStringsEqual(game.getPlayer()->getInventoryElementAt(choice[6] - '0').getType(), "weapon")){
+                            game.printRange(game.getPlayer()->getWeaponAt(choice[6] - '0').getAreasOfEffect(), game.getPlayer()->getWeaponAt(choice[6] - '0').getRange(), choice[8]);
+                        }else if(areStringsEqual(game.getPlayer()->getInventoryElementAt(choice[6] - '0').getType(), "scroll")){
+                            game.printRange(game.getPlayer()->getScrollAt(choice[6] - '0').getAreasOfEffect(), game.getPlayer()->getScrollAt(choice[6] - '0').getRange(), choice[8]);
+                        }else{
+                            std::cout<<"\nYou have to indicate a weapon or a scroll. Press enter to continue.\n";
+                            fflush(stdin);
+                            cin.ignore();
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -140,53 +175,51 @@ int main(){
                 std::cout<<"\nYou can't move in this direction. Press enter to retry.\n";
                 fflush(stdin);
                 cin.ignore();
-            }else if(error == 2){
-                std::cout<<"\nThe index is not valid. Press enter to retry.\n";
-                fflush(stdin);
-                cin.ignore();
-            }else if(error == 3){
-                std::cout<<"\nThe chosen item is not equipped. Press enter to continue.\n";
-                fflush(stdin);
-                cin.ignore();
-            }else if(error == 4){
-                std::cout<<"\nThe chosen item has not been identified yet. Press enter to continue.\n";
-                fflush(stdin);
-                cin.ignore();
             }
+            std::cout<<"\n6\n";
         }while(actionType == 0 || error != 0);
+        std::cout<<"\n7\n";
         //Check if player died because of an ability check
         if(game.getPlayer()->getHP() == 0){
             gameState = 1;
             break;
         }
-        //Move enemies
+        std::cout<<"\n8\n";
+        //Check if player won
         if(game.getPlayer()->getX() == game.getExitX() &&  game.getPlayer()->getY() == game.getExitY()){
             gameState = 2;
             break;
         } 
-            std::cout<<"\nI:"<<game.getPlayer()->getY()<<" J:"<<game.getPlayer()->getX()<<"\n\n";
-        game.moveEnemies();
+        std::cout<<"\n9\n";
+        //Move enemies
+        std::cout<<"moving enemies...";
+        if(game.lapsedTime > 0)
+            game.moveEnemies();
+        std::cout<<"enemies moved";
         //Check if the player died after the enemy moves
         if(game.getPlayer()->getHP() == 0){
             gameState = 1;
             break;
         }
+        std::cout<<"\n10\n";
     }
-
+    std::cout<<"\n11\n";
     if(gameState == 2){
-        system("cls");
+        //system("cls");
         int score = 0;
         for(int i = 1; i != game.getPlayer()->getLvl(); i++){
             score += 100 * i;
         }
         score += 25 * game.getPlayer()->getGp() + game.getPlayer()->getExp();
         std::cout<<"\n\n\n                         \\(*-*)/ Congratulations! You won with a score of "<<score<<" \\(*-*)/\n\n\n";
+        system("pause");
     }else{
         game.printInterface();
         fflush(stdin);
         cin.ignore();
-        system("cls");
+        //system("cls");
         std::cout<<"\n\n\n                          /(-.-)\\ You lost... Better luck next time! /(-.-)\\\n\n\n";
+        system("pause");
     }
     //Free pointers
     delete game.getPlayer();

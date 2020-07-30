@@ -1,5 +1,5 @@
 #include "MapElements.h"
-
+#include <map> 
 
 //DOOR SECTION
 //Door constructor
@@ -43,10 +43,10 @@ void Door::setLocked(bool input){this->locked = input;}
 //ROOM SECTION
 //Room constructor
 Room::Room(int id, std::string chWall, std::string chFloor){
-    w = MAX_ROOM_WIDTH - rand() % (MAX_ROOM_WIDTH - 5);
-    h = MAX_ROOM_HEIGHT - rand() % (MAX_ROOM_HEIGHT - 5);
-    x = (MAX_X_VALUE - rand() % MAX_X_VALUE);
-    y = (MAX_Y_VALUE - rand() % MAX_Y_VALUE);
+    w = MIN_ROOM_WIDTH + rand() % (MAX_ROOM_WIDTH - MIN_ROOM_WIDTH + 1);
+    h = MIN_ROOM_HEIGHT + rand() % (MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT + 1);
+    x = MIN_X_VALUE + rand() % (MAX_X_VALUE - MIN_X_VALUE + 1);
+    y = MIN_Y_VALUE + rand() % (MAX_Y_VALUE - MIN_Y_VALUE + 1);
     this->id = id;
     this->chWall = chWall;
     this->chFloor = chFloor;
@@ -101,12 +101,15 @@ void Game::generateMap(){
     this->chExit = "0x00BB";
     this->chPath = "0x0023";
     this->chFog = "0x003F";
-
+    std::cout<<"\nCreating rooms...";
     for(int counter = 0; counter != ROOMS_NUMBER; counter ++){
         addRoom(counter + 4, "0x2593", "0x00B7");
     }
+    std::cout<<"\nDone!\nLinking rooms...";
     linkRooms();
+    std::cout<<"\nDone!\nExporting map...";
     exportMap();
+    std::cout<<"\nDone!";
 }
 
 void Game::initMap(){
@@ -147,9 +150,12 @@ void Game::initMap(){
             //Add doors
             for(xml_node<> * doorNode = roomNode->first_node("Doors")->first_node("Door"); doorNode; doorNode = doorNode->next_sibling()){
                 if(std::string(doorNode->name()) == "Door"){
-                    std::unique_ptr<Door> tempDoor = std::unique_ptr<Door>(new Door(atoi(doorNode->first_attribute("id")->value()), atoi(doorNode->first_attribute("x")->value()), atoi(doorNode->first_attribute("y")->value()), atoi(doorNode->first_attribute("connectedDoorId")->value()), atoi(doorNode->first_attribute("connectedRoomId")->value()), (bool)(atoi(doorNode->first_attribute("locked")->value())), doorNode->first_attribute("chOpen")->value(), doorNode->first_attribute("chLocked")->value()));
-                    m[tempDoor->getY()][tempDoor->getX()] = -1*(rooms.back()->getId());
-                    rooms.back()->addDoor(tempDoor);
+                    std::unique_ptr<Door> tempDoor = std::unique_ptr<Door>(new Door(atoi(doorNode->first_attribute("id")->value()), atoi(doorNode->first_attribute("x")->value()) + rooms.back()->getX(), atoi(doorNode->first_attribute("y")->value()) + rooms.back()->getY(), atoi(doorNode->first_attribute("connectedDoorId")->value()), atoi(doorNode->first_attribute("connectedRoomId")->value()), (bool)(atoi(doorNode->first_attribute("locked")->value())), doorNode->first_attribute("chOpen")->value(), doorNode->first_attribute("chLocked")->value()));
+                    //If this wall has not been eliminated because of room fusions
+                    if(m[tempDoor->getY()][tempDoor->getX()] > 3){
+                        m[tempDoor->getY()][tempDoor->getX()] = -1*(rooms.back()->getId());
+                        rooms.back()->addDoor(tempDoor);
+                    }
                 }
             }
 
@@ -160,7 +166,7 @@ void Game::initMap(){
                 for (std::vector<std::unique_ptr<Enemy>>::iterator enemyIt = bestiaryEnemies.begin(); enemyIt != enemyEnd; enemyIt++){
                     if(areStringsEqual((**enemyIt).getLabel(), enemyNode->first_attribute("label")->value())){
                         std::unique_ptr<Enemy> enemy;
-                        enemy = std::unique_ptr<Enemy>(new Enemy(**enemyIt, atoi(enemyNode->first_attribute("x")->value()), atoi(enemyNode->first_attribute("y")->value())));
+                        enemy = std::unique_ptr<Enemy>(new Enemy(**enemyIt, atoi(enemyNode->first_attribute("x")->value()) + rooms.back()->getX(), atoi(enemyNode->first_attribute("y")->value()) + rooms.back()->getY()));
                         enemies.push_back(std::move(enemy));
                     }
                 }
@@ -174,25 +180,35 @@ void Game::initMap(){
                     for (std::vector<Weapon>::iterator wIt = inventoryWeapons.begin(); wIt != wEnd; wIt++){
                         if(areStringsEqual((*wIt).getLabel(), itemNode->first_attribute("label")->value())){
                             std::unique_ptr<Weapon> weapon;
-                            weapon = std::unique_ptr<Weapon>(new Weapon(*wIt, atoi(itemNode->first_attribute("x")->value()), atoi(itemNode->first_attribute("y")->value())));
+                            weapon = std::unique_ptr<Weapon>(new Weapon(*wIt, atoi(itemNode->first_attribute("x")->value()) + rooms.back()->getX(), atoi(itemNode->first_attribute("y")->value()) + rooms.back()->getY()));
                             weapons.push_back(std::move(weapon));
+                        }
+                    }
+                }else if(areStringsEqual(itemNode->first_attribute("type")->value(), "scroll")){
+                    //It's a spell
+                    std::vector<Scroll>::iterator wEnd = inventoryScrolls.end();
+                    for (std::vector<Scroll>::iterator wIt = inventoryScrolls.begin(); wIt != wEnd; wIt++){
+                        if(areStringsEqual((*wIt).getLabel(), itemNode->first_attribute("label")->value())){
+                            std::unique_ptr<Scroll> scroll;
+                            scroll = std::unique_ptr<Scroll>(new Scroll(*wIt, atoi(itemNode->first_attribute("x")->value()) + rooms.back()->getX(), atoi(itemNode->first_attribute("y")->value()) + rooms.back()->getY()));
+                            scrolls.push_back(std::move(scroll));
                         }
                     }
                 }else{
                     //It's an item
                     if(areStringsEqual("key", itemNode->first_attribute("type")->value())){
                         //Key
-                        std::unique_ptr<InventoryElement> item = std::unique_ptr<InventoryElement>(new InventoryElement(atoi(itemNode->first_attribute("x")->value()), atoi(itemNode->first_attribute("y")->value()), itemNode->first_attribute("label")->value(), "key", "0x00BF"));
+                        std::unique_ptr<InventoryElement> item = std::unique_ptr<InventoryElement>(new InventoryElement(atoi(itemNode->first_attribute("x")->value()) + rooms.back()->getX(), atoi(itemNode->first_attribute("y")->value()) + rooms.back()->getY(), itemNode->first_attribute("label")->value(), "key", "0x00BF"));
                         items.push_back(std::move(item));
                     }else if(areStringsEqual("gp", itemNode->first_attribute("type")->value())){
                         //GP
-                        std::unique_ptr<InventoryElement> item = std::unique_ptr<InventoryElement>(new InventoryElement(atoi(itemNode->first_attribute("x")->value()), atoi(itemNode->first_attribute("y")->value()), itemNode->first_attribute("label")->value(), "gp", "0x00BF"));
+                        std::unique_ptr<InventoryElement> item = std::unique_ptr<InventoryElement>(new InventoryElement(atoi(itemNode->first_attribute("x")->value()) + rooms.back()->getX(), atoi(itemNode->first_attribute("y")->value()) + rooms.back()->getY(), itemNode->first_attribute("label")->value(), "gp", "0x00BF"));
                         items.push_back(std::move(item));
                     }else{
                         std::vector<InventoryElement>::iterator iEnd = inventoryItems.end();
                         for (std::vector<InventoryElement>::iterator iIt = inventoryItems.begin(); iIt != iEnd; iIt++){
                             if(areStringsEqual((*iIt).getLabel(), itemNode->first_attribute("label")->value())){
-                                std::unique_ptr<InventoryElement> item = std::unique_ptr<InventoryElement>(new InventoryElement(*iIt, atoi(itemNode->first_attribute("x")->value()), atoi(itemNode->first_attribute("y")->value())));
+                                std::unique_ptr<InventoryElement> item = std::unique_ptr<InventoryElement>(new InventoryElement(*iIt, atoi(itemNode->first_attribute("x")->value()) + rooms.back()->getX(), atoi(itemNode->first_attribute("y")->value()) + rooms.back()->getY()));
                                 items.push_back(std::move(item));
                             }
                         }
@@ -205,7 +221,7 @@ void Game::initMap(){
             if(roomNode->first_node("treasureChests") != nullptr){
                 for(xml_node<> * itemNode = roomNode->first_node("treasureChests")->first_node(); itemNode; itemNode = itemNode->next_sibling()){
                     std::unique_ptr<InventoryElement> item;
-                    item = std::unique_ptr<InventoryElement>(new InventoryElement(atoi(itemNode->first_attribute("x")->value()), atoi(itemNode->first_attribute("y")->value()), itemNode->first_attribute("label")->value(), itemNode->first_attribute("type")->value(), "0x00A9"));
+                    item = std::unique_ptr<InventoryElement>(new InventoryElement(atoi(itemNode->first_attribute("x")->value()) + rooms.back()->getX(), atoi(itemNode->first_attribute("y")->value()) + rooms.back()->getY(), itemNode->first_attribute("label")->value(), itemNode->first_attribute("type")->value(), "0x00A9"));
                     item->setChest(true);
                     items.push_back(std::move(item));
                 }
@@ -284,9 +300,9 @@ void Game::exportMap(){
             door->append_attribute(attr);
             attr = wdoc.allocate_attribute("connectedRoomId", wdoc.allocate_string(to_string((**doorsIt).getConnectedRoomId()).c_str()));
             door->append_attribute(attr);
-            attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string((**doorsIt).getX()).c_str()));
+            attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string((**doorsIt).getX() - (**it).getX()).c_str()));
             door->append_attribute(attr);
-            attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string((**doorsIt).getY()).c_str()));
+            attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string((**doorsIt).getY() - (**it).getY()).c_str()));
             door->append_attribute(attr);
             attr = wdoc.allocate_attribute("room", wdoc.allocate_string((**it).getLabel().c_str()));
             door->append_attribute(attr);
@@ -303,8 +319,8 @@ void Game::exportMap(){
         //Generate and add enemies
         xml_node<> *enemiesNode = wdoc.allocate_node( node_element,  wdoc.allocate_string("Enemies") );
         room->append_node(enemiesNode);
-        unsigned int random = (rand() % (MAX_ENEMIES_NUMBER + 1 - MIN_ENEMIES_NUMBER)) + MIN_ENEMIES_NUMBER;
-        for(int i = 0; i != random; i++){
+        unsigned int random1 = (rand() % (MAX_ENEMIES_NUMBER + 1 - MIN_ENEMIES_NUMBER)) + MIN_ENEMIES_NUMBER;
+        for(int i = 0; i != random1; i++){
             //Decide what type of enemy will it be (basing on the bestiary)
             unsigned int enemyIndex = rand() % bestiaryEnemies.size();
             do{
@@ -316,9 +332,9 @@ void Game::exportMap(){
             enemy = wdoc.allocate_node(node_element, wdoc.allocate_string("Enemy") );
             attr = wdoc.allocate_attribute("label", wdoc.allocate_string(bestiaryEnemies.at(enemyIndex)->getLabel().c_str()));
             enemy->append_attribute(attr);
-            attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string(tempX).c_str()));
+            attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string(tempX - (**it).getX()).c_str()));
             enemy->append_attribute(attr);
-            attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string(tempY).c_str()));
+            attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string(tempY - (**it).getY()).c_str()));
             enemy->append_attribute(attr);
 
             enemiesNode->append_node(enemy);
@@ -327,8 +343,8 @@ void Game::exportMap(){
         //Generate and add items
         xml_node<> *loots = wdoc.allocate_node( node_element,  wdoc.allocate_string("Loots") );
         room->append_node(loots);
-        random = (rand() % (MAX_ITEMS_NUMBER + 1 - MIN_ITEMS_NUMBER)) + MIN_ITEMS_NUMBER;
-        for(int i = 0; i != random; i++){
+        random1 = (rand() % (MAX_ITEMS_NUMBER + 1 - MIN_ITEMS_NUMBER)) + MIN_ITEMS_NUMBER;
+        for(int i = 0; i != random1; i++){
             do{
                 tempX = rand()%((**it).getX() + (**it).getWidth() - (**it).getX() - 2) + (**it).getX() + 1;
                 tempY = rand()%((**it).getY() + (**it).getHeight() - (**it).getY() - 2) + (**it).getY() + 1;
@@ -336,9 +352,9 @@ void Game::exportMap(){
             m[tempY][tempX] = 3;
             xml_node<> *item;
             item = wdoc.allocate_node(node_element, wdoc.allocate_string("Loot") );
-            attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string(tempX).c_str()));
+            attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string(tempX - (**it).getX()).c_str()));
             item->append_attribute(attr);
-            attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string(tempY).c_str()));
+            attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string(tempY - (**it).getY()).c_str()));
             item->append_attribute(attr);
 
             //Decide randomly if the items is a weapon, an item, GP or a key
@@ -392,7 +408,7 @@ void Game::exportMap(){
         if(rand()%CHESTS_CHANCE == 0){
             xml_node<> *chests = wdoc.allocate_node( node_element,  wdoc.allocate_string("treasureChests") );
             room->append_node(chests);
-            random = (rand() % (MAX_CHESTS_NUMBER + 1 - MIN_CHESTS_NUMBER)) + MIN_CHESTS_NUMBER;
+            int random = (rand() % (MAX_CHESTS_NUMBER + 1 - MIN_CHESTS_NUMBER)) + MIN_CHESTS_NUMBER;
             for(int i = 0; i != random; i++){
                 do{
                     tempX = rand()%((**it).getX() + (**it).getWidth() - (**it).getX() - 2) + (**it).getX() + 1;
@@ -402,9 +418,9 @@ void Game::exportMap(){
 
                 xml_node<> *chest;
                 chest = wdoc.allocate_node(node_element, wdoc.allocate_string("Chest") );
-                attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string(tempX).c_str()));
+                attr = wdoc.allocate_attribute("x", wdoc.allocate_string(to_string(tempX - (**it).getX()).c_str()));
                 chest->append_attribute(attr);
-                attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string(tempY).c_str()));
+                attr = wdoc.allocate_attribute("y", wdoc.allocate_string(to_string(tempY - (**it).getY()).c_str()));
                 chest->append_attribute(attr);
                 //Decide what will the chest contain
                 switch (rand() % 2)
@@ -459,15 +475,17 @@ void Game::printInterface(){
                     bool written = false;
                     for (std::vector<std::unique_ptr<Enemy>>::iterator it = enemies.begin(); it != end; it++ ){
                         if((**it).getY() == i && (**it).getX() == j){
-                            written = true;
-                            if(((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 75)
-                                printUnicode((*it)->getCh(), 2);
-                            else if (((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 50)
-                                printUnicode((*it)->getCh(), 3);
-                            else if (((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 25)
-                                printUnicode((*it)->getCh(), 4);
-                            else
-                                printUnicode((*it)->getCh(), 5);
+                            if((**it).getHasAttackedLastTurn() || getDistance(**it, *player) < PLAYER_SIGHT){
+                                written = true;
+                                if(((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 75)
+                                    printUnicode((*it)->getCh(), 2);
+                                else if (((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 50)
+                                    printUnicode((*it)->getCh(), 3);
+                                else if (((*it)->getHP() * 100)/((*it)->getMaxHP()) >= 25)
+                                    printUnicode((*it)->getCh(), 4);
+                                else
+                                    printUnicode((*it)->getCh(), 5);
+                            } //Else controllare se path/floor sulla matrice numerica
                         }
                     }
                     //Check if an item is in this position
@@ -496,6 +514,8 @@ void Game::printInterface(){
                         }
                     }
 
+                    
+
                     //Check if it's a map element
                     if(!written){
                         switch (getElementType(i, j)){
@@ -506,16 +526,18 @@ void Game::printInterface(){
                             case 1:
                                 //Door
                                 {
-                                    std::vector<std::unique_ptr<Door>>::iterator end = rooms.at(abs(m[i][j]) - 4)->doors.end();
-                                    std::vector<std::unique_ptr<Door>>::iterator it = rooms.at(abs(m[i][j]) - 4)->doors.begin();
-                                    //Iterate over every door of the connected room to check if it is the right one
-                                    for (it; it != end; it++){
-                                        if((**it).getY() == i && (**it).getX() == j){
-                                            if((**it).isLocked())
-                                                printUnicode((**it).getChLocked(), 0);
-                                            else
-                                                printUnicode((**it).getChUnlocked(), 0);
-                                            break;
+                                    std::vector<std::unique_ptr<Room>>::iterator roomsEnd = rooms.end();
+                                    for(std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin(); it != roomsEnd; it ++){
+                                        std::vector<std::unique_ptr<Door>>::iterator end = (**it).doors.end();
+                                        for (std::vector<std::unique_ptr<Door>>::iterator it2 = (**it).doors.begin(); it2 != end; it2++ ){
+                                            if((**it2).getY() == i && (**it2).getX() == j){
+                                                if((**it2).isLocked()){
+                                                    printUnicode((**it2).getChLocked(), 0);
+                                                }else{
+                                                    printUnicode((**it2).getChUnlocked(), 0);
+                                                }
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -627,9 +649,11 @@ void Game::printInterface(){
                                 std::cout<<termcolor::green<<player->getInventoryElementAt(y-12).getLabel();
                             else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "potion"))
                                 std::cout<<termcolor::blue<<player->getInventoryElementAt(y-12).getLabel();
-                            else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "weapon"))
+                            else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "weapon")){
                                 std::cout<<termcolor::yellow<<player->getInventoryElementAt(y-12).getLabel();
-                            else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "protection"))
+                                if(player->getWeaponAt(y-12).getDurability() > 0)
+                                    std::cout<<" ("<<player->getWeaponAt(y-12).getDurability()<<")";
+                            }else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "protection"))
                                 std::cout<<termcolor::white<<player->getInventoryElementAt(y-12).getLabel();
                             else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "scroll"))
                                 std::cout<<termcolor::magenta<<player->getInventoryElementAt(y-12).getLabel();
@@ -657,7 +681,64 @@ void Game::printInterface(){
         std::cout<<std::endl<<"What would you like to do?\nW = move north\nS = move south\nA = move ovest\nD = move east\nEquip objectIndex = equip an object, a weapon or an armor";
         std::cout<<std::endl<<"Atk w/a/s/d = attack in the chosen direction\nUse w/a/s/d = use the equipped object in the chosen direction\nCast spellIndex w/a/s/d = cast the spell at the index spellIndex";
         std::cout<<std::endl<<"Open w/a/s/d = open the door in the chosen direction\nTake = loot the surrounding items\nDiscard objectIndex = discard the object at the index objectIndex";
-        std::cout<<std::endl<<"Identify objectIndex = show the description of the object at the index objectIndex\n";
+        std::cout<<std::endl<<"Identify objectIndex = show the description of the object at the index objectIndex\nRange objectIndex w/a/s/d = show the range in the choosen direction of the object at the index objectIndex\n";
+    }
+}
+
+void Game::printMatrix(){
+    for(int i = 0; i != MAX_MATRIX_HEIGHT; i++){
+        std::cout<<i<<" ";
+        for(int j = 0; j != MAX_MATRIX_WIDTH; j++){
+            if(i == exitY && j == exitX){
+                printUnicode(chExit, 4);
+            }else{
+                switch (getElementType(i, j)){
+                            case 0:
+                            //Nothing
+                                std::cout<<" ";
+                                break;
+                            case 1:
+                                //Door
+                                {
+                                    std::vector<std::unique_ptr<Room>>::iterator roomsEnd = rooms.end();
+                                    for(std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin(); it != roomsEnd; it ++){
+                                        std::vector<std::unique_ptr<Door>>::iterator end = (**it).doors.end();
+                                        for (std::vector<std::unique_ptr<Door>>::iterator it2 = (**it).doors.begin(); it2 != end; it2++ ){
+                                            if((**it2).getY() == i && (**it2).getX() == j){
+                                                if((**it2).isLocked()){
+                                                    printUnicode((**it2).getChLocked(), 0);
+                                                }else{
+                                                    printUnicode((**it2).getChUnlocked(), 0);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            case 2:
+                                //Floor
+                                printUnicode(rooms.at(abs(m[i][j]) - 4)->getChFloor(), 0);
+                                break;
+                            case 3:
+                                //Path
+                                printUnicode(chPath, 0);
+                                break;
+                            case 4:
+                                //Wall
+                                printUnicode(rooms.at(abs(m[i][j]) - 4)->getChWall(), 0);
+                                break;
+                            case 8:
+                                //Exit
+                                printUnicode(this->chExit, 0);
+                                break;
+                            default:
+                                std::cout<<".";
+                                break;
+                        }
+                    }
+        }
+        std::cout<<"\n";
     }
 }
 
@@ -755,28 +836,33 @@ int Game::getElementType(int i, int j){
                     return 6;
             }
         }
-        //Check if door
-        std::vector<std::unique_ptr<Door>>::iterator end = rooms.at(abs(m[i][j])-4)->doors.end();
-        for (std::vector<std::unique_ptr<Door>>::iterator it = rooms.at(abs(m[i][j])-4)->doors.begin(); it != end; it++ ){
-            if((**it).getY() == i && (**it).getX() == j){
-                return 1;
-            }
-        }
 
-        //Check if floor/path
-        if(i >= rooms.at(abs(m[i][j]) - 4)->getY() && i <= rooms.at(abs(m[i][j]) - 4)->getY() + rooms.at(abs(m[i][j]) - 4)->getHeight() -1
-             && j >= rooms.at(abs(m[i][j]) - 4)->getX() && j <= rooms.at(abs(m[i][j]) - 4)->getX() + rooms.at(abs(m[i][j]) - 4)->getWidth() -1){
-            //It's floor
-            return 2;
-        }else{
-            //It's path
-            return 3;
+        std::vector<std::unique_ptr<Room>>::iterator roomsEnd = rooms.end();
+        //Check if floor/path/door
+        for(std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin(); it != roomsEnd; it ++){
+            std::vector<std::unique_ptr<Door>>::iterator end = (**it).doors.end();
+            for (std::vector<std::unique_ptr<Door>>::iterator it2 = (**it).doors.begin(); it2 != end; it2++ ){
+                if((**it2).getY() == i && (**it2).getX() == j){
+                    //It's door
+                    return 1;
+                }
+            }
+            
+            if(i >= (**it).getY() && i <= (**it).getY() + (**it).getHeight() -1
+             && j >= (**it).getX() && j <= (**it).getX() + (**it).getWidth() -1){
+                //It's floor
+                return 2;
+            }
+            
         }
+        //It's path
+        return 3;
     }
     else if(m[i][j] > 3){ 
         //Wall
         return 4;
     }
+    return 0;
 }
 
 void Game::addRoom(std::unique_ptr<Room>& room){
@@ -796,7 +882,16 @@ void Game::addRoom(std::unique_ptr<Room>& room){
             }
             if((j != room->getX() && i != room->getY()) && (j != room->getX() + room->getWidth() -1 && i != room->getY() + room->getHeight() -1))
                 m[i][j] = -1*room->getId();
-            else if((m[i][j] >= 4 || m[i][j] <= -4) && !isCorner){
+            else if((m[i][j] >= 4 || m[i][j] <= -4) && !isCorner){ //There is another room, fuse them
+                //If there is a door, delete it
+                std::vector<std::unique_ptr<Door>>::iterator doorIt = (*rooms.at(abs(m[i][j]) - 4)).doors.begin();
+                std::vector<std::unique_ptr<Door>>::iterator doorEnd = (*rooms.at(abs(m[i][j]) - 4)).doors.end();
+                for(doorIt; doorIt != doorEnd; doorIt ++){
+                    if((**doorIt).getX() == j && (**doorIt).getY() == i){
+                        doorIt = (*rooms.at(abs(m[i][j]) - 4)).doors.erase(doorIt);
+                        break;
+                    }
+                }
                 m[i][j] = -1*room->getId();
             }
             else
@@ -844,8 +939,8 @@ void Game::addRoom(int id, std::string chWall, std::string chFloor){
 
     //If there is no game exit, generate it
     if(this->exitX == 0 && this->exitY == 0){
-        this->exitX = (rand() % (room->getWidth() - 1)) + room->getX() + 1;
-        this->exitY = (rand() % (room->getHeight() - 1)) + room->getY() + 1;
+        this->exitX = (rand() % (room->getWidth() - 2)) + room->getX() + 1;
+        this->exitY = (rand() % (room->getHeight() - 2)) + room->getY() + 1;
         m[exitY][exitX] = 3;
     }
     
@@ -893,7 +988,7 @@ int Game::isColliding(Room& room1, Room& room2){
     return collision;
 }
 
-bool Game::linkRooms(){
+void Game::linkRooms(){
     std::vector<std::unique_ptr<Room>>::iterator end = rooms.end();
     std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin();
     //Check if every room is fused
@@ -909,17 +1004,15 @@ bool Game::linkRooms(){
         it = rooms.begin();
         for (it; it != end; it++){
             int otherIndex = rand() % rooms.size();
-            int counter = 0;
-            while(otherIndex == it - rooms.begin() && isColliding(**it, *(rooms.at(otherIndex))) != 0){
+            while(otherIndex == it - rooms.begin() || isColliding(**it, *(rooms.at(otherIndex))) != 0){
                 otherIndex = rand() % rooms.size();
-                counter ++;
             }
             createPath(**it, *(rooms.at(otherIndex)), doorsCounter);
         }
     }
 }
 
-bool Game::linkRoomsByDoors(){
+void Game::linkRoomsByDoors(){
     std::vector<std::unique_ptr<Room>>::iterator end = rooms.end();
     std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin();
     //Iterate over every room
@@ -950,6 +1043,9 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
     //check if there is a possible straight line
     int straightX = 0;
     int straightY = 0;
+
+    std::vector<unsigned int> addedDoorsIds;
+    std::vector<unsigned int> addedRoomsIds;
 
     int x;
     int y;
@@ -1022,7 +1118,7 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                 }else if(getElementType(y, straightX) == 0)
                     m[y][straightX] = room1.getId()*-1;
             }
-            break;
+            return true;
         }
     }
     //check if horizontal straight
@@ -1085,16 +1181,14 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                         //Prendere la scorsa porta e darle come connected id quello della nuova
                         if(doors > 1 && previousRoomId != abs(m[straightY][x]) - 4){
                             rooms.at(previousRoomId)->doors.back()->setConnectedDoorId(doorsCounter);
-                            //std::cout<<"\nDoor "<<rooms.at(previousRoomId)->doors.back()->getId()<<" connected to door "<<doorsCounter<<"\n";
                             rooms.at(previousRoomId)->doors.back()->setConnectedRoomId(abs(m[straightY][x]));
-                            //std::cout<<"\n"<<previousRoomId<<"  "<<abs(m[straightY][x]) - 4;
                         }
                         m[straightY][x] = m[straightY][x] * -1;
                         previousRoomId = abs(m[straightY][x]) - 4;
                     }else if(getElementType(straightY, x) == 0)
                         m[straightY][x] = room1.getId()*-1;
                 }
-                break;
+                return true;;
             }
         }
     }
@@ -1114,7 +1208,9 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
         else if(x >= room2.getX() + room2.getWidth() -1)
             inc = -1;
         bool ok;
+        unsigned int counter = 0;
         do{
+            counter ++;
             y = (room1.getY() + room1.getHeight() -2) - rand() % (room1.getHeight() -2);
             std::vector<std::unique_ptr<Room>>::iterator end = rooms.end();
             std::vector<std::unique_ptr<Room>>::iterator it = rooms.begin();
@@ -1125,13 +1221,15 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                 }
             }
 
-            //Check if the path woul go on a door
+            //Check if the path would go on a door
             for(int k = x; (k <= room2.getX() || k >= room2.getX() + room2.getWidth() -1); k += inc){
                 if(getElementType(y, k) == 1){
                     ok = false;
                     break;
                 }
             }
+            if(counter > ROOMS_NUMBER*100)
+                return false;
         }while(!ok);
 
         int startingPoint[] = {y, x};
@@ -1142,12 +1240,16 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
             m[y][x + 1] = room1.getId() * -1; //Door
             bool locked = rand()%2;
             std::unique_ptr<Door> tempDoor = std::unique_ptr<Door>(new Door(doorsCounter, x + 1, y, locked, "0x004F", "0x00D8"));
+            addedDoorsIds.push_back(tempDoor->getId());
+            addedRoomsIds.push_back(previousRoomId);
             room1.addDoor(tempDoor);
             previousRoomId = room1.getId() - 4;
         }else{
             m[y][x - 1] = room1.getId() * -1; //Door
             bool locked = rand()%2;
             std::unique_ptr<Door> tempDoor = std::unique_ptr<Door>(new Door(doorsCounter, x - 1, y, locked, "0x004F", "0x00D8"));
+            addedDoorsIds.push_back(tempDoor->getId());
+            addedRoomsIds.push_back(previousRoomId);
             room1.addDoor(tempDoor);
             previousRoomId = room1.getId() - 4;
         }
@@ -1163,12 +1265,12 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                 doors ++;
                 bool locked = rand()%2;
                 std::unique_ptr<Door> tempDoor = std::unique_ptr<Door>(new Door(doorsCounter, k, y, locked, "0x004F", "0x00D8"));
+                addedDoorsIds.push_back(tempDoor->getId());
+                addedRoomsIds.push_back(abs(m[y][k]) - 4);
                 rooms.at(abs(m[y][k]) - 4)->addDoor(tempDoor);
                 if(previousRoomId != abs(m[y][k]) - 4){
                     rooms.at(previousRoomId)->doors.back()->setConnectedDoorId(doorsCounter);
-                    //std::cout<<"\nDoor "<<rooms.at(previousRoomId)->doors.back()->getId()<<" connected to door "<<doorsCounter<<"\n";
                     rooms.at(previousRoomId)->doors.back()->setConnectedRoomId(abs(m[y][k]));
-                    //std::cout<<"\n"<<previousRoomId<<"  "<<(abs(m[y][k]));
                 }
                 previousRoomId = abs(m[y][k]) - 4;
                 m[y][k] = m[y][k] * -1; //Door
@@ -1206,7 +1308,6 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                         break;
                     c++;
                 }while((y + c*inc <= MAX_MATRIX_HEIGHT -1 && y + c*inc > -1) && (y + c*inc <= room2.getY() || y + c*inc >= room2.getY() + room2.getHeight() -1));
-                    
                 //std::cout<<std::endl<<"Riga "<<k + t*oldInc<<"   Counter "<<wallsCounter<<"\n";
                 if(wallsCounter < 2)
                     break;
@@ -1235,14 +1336,12 @@ bool Game::createPath(Room& room1, Room& room2, int& doorsCounter){
                     m[k][x] = rooms.at(previousRoomId)->getId() * -1; //Door
                 }
             }
-        
-
-        //std::cout<<"\nfine 2\n";
     }
+    return true;
     
 }
 
-bool Game::createPathByDoors(Door& door1, Door& door2, int roomId){
+void Game::createPathByDoors(Door& door1, Door& door2, int roomId){
     //Check if there is a possible straight line
     int straightX = 0;
     int straightY = 0;
@@ -1256,7 +1355,6 @@ bool Game::createPathByDoors(Door& door1, Door& door2, int roomId){
         for(int i = door1.getY() + inc; i != door2.getY(); i += inc){
             m[i][straightX] = -1*roomId;
         }
-        return true;
     }
     //Check if horizontal straight
     else if(straightX == 0 && door1.getY() == door2.getY()){
@@ -1266,7 +1364,6 @@ bool Game::createPathByDoors(Door& door1, Door& door2, int roomId){
         for(int j = door1.getX() + inc; j != door2.getX(); j += inc){
             m[straightY][j] = -1*roomId;
         }
-        return true;
     }else{
         int y;
         int j;
@@ -1276,6 +1373,12 @@ bool Game::createPathByDoors(Door& door1, Door& door2, int roomId){
 
         //Horizontal path writing
         for(j = door1.getX() + inc; j != door2.getX(); j += inc){
+            //If there is a wall, add a door
+            if(m[door1.getY()][j] > 3){
+                bool locked = rand() % 2;
+                std::unique_ptr<Door> tempDoor = std::unique_ptr<Door>(new Door(0, j, door1.getY(), locked, "0x004F", "0x00D8"));
+                rooms.at(abs(m[door1.getY()][j]) - 4)->addDoor(tempDoor);
+            }
             m[door1.getY()][j] = -1*roomId;
         }
 
@@ -1286,9 +1389,54 @@ bool Game::createPathByDoors(Door& door1, Door& door2, int roomId){
             inc = 1;
         //Vertical path writing
         for(int i = door1.getY(); i != door2.getY(); i += inc){
+            //If there is a wall, add a door
+            if(m[i][j] > 3){
+                bool locked = rand() % 2;
+                std::unique_ptr<Door> tempDoor = std::unique_ptr<Door>(new Door(0, j, i, locked, "0x004F", "0x00D8"));
+                rooms.at(abs(m[i][j]) - 4)->addDoor(tempDoor);
+            }
             m[i][j] = -1*roomId;
         }
         
+    }
+}
+
+void Game::clearUnusedDoors(){
+    using namespace std;
+    //Clear unused doors (doors with connectedDoorId = 0 and nessun'altra porta le collega)
+    vector<unique_ptr<Room>>::iterator roomsIt = rooms.begin();
+    vector<unique_ptr<Room>>::iterator roomsEnd = rooms.end();
+    for(roomsIt; roomsIt != roomsEnd; roomsIt ++){
+        vector<unique_ptr<Door>>::iterator doorIt = (**roomsIt).doors.begin();
+        vector<unique_ptr<Door>>::iterator doorEnd = (**roomsIt).doors.end();
+        int counter = 0;
+        if((**roomsIt).doors.size() > 0){
+            for(int i = 0; i < (**roomsIt).doors.size() - counter; i++){
+                if((**roomsIt).doors.at(i)->getConnectedDoorId() == 0){
+                    bool toBeDeleted = true;
+                    //Chech if the door has a near path
+                    if(getElementType((**roomsIt).doors.at(i)->getY() - 1,(**roomsIt).doors.at(i)->getX()) == 3){
+                        toBeDeleted = false;
+                    }else if(getElementType((**roomsIt).doors.at(i)->getY() + 1, (**roomsIt).doors.at(i)->getX()) == 3){
+                        toBeDeleted = false;
+                    }else if(getElementType((**roomsIt).doors.at(i)->getY(), (**roomsIt).doors.at(i)->getX() - 1) == 3){
+                        toBeDeleted = false;
+                    }else if(getElementType((**roomsIt).doors.at(i)->getY(), (**roomsIt).doors.at(i)->getX() + 1) == 3){
+                        toBeDeleted = false;
+                    }
+
+                    if(toBeDeleted){
+                        m[(**roomsIt).doors.at(i)->getY()][(**roomsIt).doors.at(i)->getX()] = (**roomsIt).getId();
+                        (**roomsIt).doors.erase((**roomsIt).doors.begin() + i);
+                        i--;
+                        counter ++;
+                        if((**roomsIt).doors.size() == 0){
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1326,8 +1474,20 @@ void Game::chooseClass(){
         }
 	}
     std::string temp;
-    std::cout<<"\n\nWhat class do you choose? ";
-    std::cin>>temp;
+    bool ok = false;
+    while(!ok){
+        std::cout<<"\n\nWhat class do you choose? ";
+        std::cin>>temp;
+        for (xml_node<> * classNode = root_node->first_node("heroClass"); classNode; classNode = classNode->next_sibling()){
+            if(areStringsEqual(temp, classNode->first_attribute("label")->value())){
+                ok = true;
+            }
+        }
+
+        if(!ok){
+            std::cout<<"\nThe input doesn't correspond to any class. Try Again.\n";
+        }
+    }
 
     for (xml_node<> * classNode = root_node->first_node("heroClass"); classNode; classNode = classNode->next_sibling()){
         if(areStringsEqual(temp, classNode->first_attribute("label")->value())){
@@ -1343,9 +1503,8 @@ void Game::chooseClass(){
                 unsigned int tempRoomIndex = rand() % ROOMS_NUMBER;
                 tempX = rooms[tempRoomIndex]->getX() + rooms[tempRoomIndex]->getWidth() -2 - rand() % (rooms[tempRoomIndex]->getWidth() -2);
                 tempY = rooms[tempRoomIndex]->getY() + rooms[tempRoomIndex]->getHeight() -2 - rand() % (rooms[tempRoomIndex]->getHeight() -2);
-            }while(getElementType(tempY, tempX) != 2 || getDistance(this->player->getX(), this->player->getY(), exitX, exitY) < 100);
+            }while(getElementType(tempY, tempX) != 2 || getDistance(tempX, tempY, exitX, exitY) < MIN_PLAYER_EXIT_DISTANCE);
             //Cycle goes on if the player is too close to the exit
-
             player = new Player(name, tempX, tempY, atoi(classNode->first_node("baseStats")->first_attribute("mpMax")->value()), 
             stof(classNode->first_node("baseStats")->first_attribute("hpMax")->value()), stof(classNode->first_node("baseStats")->first_attribute("str")->value()), 
             stof(classNode->first_node("baseStats")->first_attribute("dex")->value()), stof(classNode->first_node("baseStats")->first_attribute("mnd")->value()), 
@@ -1421,39 +1580,56 @@ void Game::moveEnemies(){
             //If player is in attack range, attack it
             if(getDistance((**it), *player) <= (**it).getAttackRange()){
                 this->player->takeDamage((**it).getLabel(), (**it).getAtkDamage());
-                std::cout<<"\n\n"<<(**it).getY()<<"  "<<(**it).getX()<<"  "<<(**it).getAttackRange()<< "   "<<getDistance((**it), *player);
+                (**it).setNextActTime(this->lapsedTime + (**it).getActTime());
+                (**it).setHasAttackedLastTurn(true);
             }
             //If player is in sight range, move towards him
             else if(getDistance((**it), *player) <= (**it).getSightRange()){
+                std::cout<<"\nA star walk";
                 walkShortestPath(**it, this->player->getX(), this->player->getY());
                 (**it).setNextActTime(this->lapsedTime + (**it).getMovTime());
             }
             //If none, just move randomly
             else{
-                do{
-                    direction = 1 + (rand() % 4);
-                    switch (direction)
-                    {
-                    case 1: //Up
-                        tempX = (**it).getX();
-                        tempY = (**it).getY() - 1;
-                        break;
-                    case 2: //Down
-                        tempX = (**it).getX();
-                        tempY = (**it).getY() + 1;
-                        break;
-                    case 3: //Left
-                        tempX = (**it).getX() - 1;
-                        tempY = (**it).getY();
-                        break;
-                    case 4: //Right
-                        tempX = (**it).getX() + 1;
-                        tempY = (**it).getY();
-                        break;
+                std::cout<<"\nRandom walk";
+                //Check available directions
+                std::vector<unsigned int> directions;
+                if(isWalkable((**it).getX(), (**it).getY() -1)){
+                    directions.push_back(1);
+                }
+                if(isWalkable((**it).getX(), (**it).getY() +1)){
+                    directions.push_back(2);
+                }
+                if(isWalkable((**it).getX() -1, (**it).getY())){
+                    directions.push_back(3);
+                }
+                if(isWalkable((**it).getX() +1, (**it).getY())){
+                    directions.push_back(4);
+                }
+                if(directions.size() > 0){
+                    direction = directions.at(rand() % directions.size());
+                    switch (direction){
+                        case 1: //Up
+                            tempX = (**it).getX();
+                            tempY = (**it).getY() - 1;
+                            break;
+                        case 2: //Down
+                            tempX = (**it).getX();
+                            tempY = (**it).getY() + 1;
+                            break;
+                        case 3: //Left
+                            tempX = (**it).getX() - 1;
+                            tempY = (**it).getY();
+                            break;
+                        case 4: //Right
+                            tempX = (**it).getX() + 1;
+                            tempY = (**it).getY();
+                            break;
                     }
-                }while(!isWalkable(tempX, tempY));
-                (**it).setCoordinates(tempX, tempY);
-                (**it).setNextActTime(this->lapsedTime + (**it).getMovTime());
+                    (**it).setCoordinates(tempX, tempY);
+                    (**it).setNextActTime(this->lapsedTime + (**it).getMovTime());
+                }
+                
             }
         }
     }
@@ -1545,6 +1721,21 @@ void Game::playerLoot(){
 }
 
 bool Game::playerCastSpell(char direction, unsigned int index){
+    if(index >= this->getPlayer()->getInventorySize()){
+        std::cout<<"\nThe index is not valid. Press enter to retry.\n";
+        fflush(stdin);
+        std::cin.ignore();
+    }if(!this->getPlayer()->getInventoryElementAt(index).getIsIdentified()){
+        //Check if the item has been identified
+        std::cout<<"\nThis item has to be identified first. Press enter to retry.\n";
+        std::cin.ignore();
+        return false;
+    }else if(!areStringsEqual(this->getPlayer()->getInventoryElementAt(index).getType(), "scroll")){
+        //Check if the item is a scroll
+        std::cout<<"\nThis item is not a scroll. Press enter to retry.\n";
+        std::cin.ignore();
+        return false;
+    }else{
         //Check if player has enough mana
         if(this->getPlayer()->getMP() - this->getPlayer()->getScrollAt(index).getMpCost() < 0){
             std::cout<<"\nYOU HAVE NO MANA!!!";
@@ -1569,6 +1760,7 @@ bool Game::playerCastSpell(char direction, unsigned int index){
             
         //Apply AOEs
         std::vector<Square> t = this->getPlayer()->getScrollAOEAt(index); 
+
         std::vector<Square>::iterator it = t.begin();
         std::vector<Square>::iterator end = t.end();
         //Iterate over weapon's AOEs
@@ -1584,6 +1776,9 @@ bool Game::playerCastSpell(char direction, unsigned int index){
         for(it2; it2 != end2; it2 ++){
             this->getPlayer()->applySelfEffect(*it2);
         }
+        
+    }
+    return true;
 }
 
 void Game::playerAttack(char direction){
@@ -1636,8 +1831,9 @@ void Game::playerAOE(Square effect, unsigned int damage, unsigned int range, int
     int rd;
     fd = effect.getFd();
     rd = effect.getRd();
+    int counter = 0;
     if(iInc != 0){
-        //std::cout<<"\n\n\n"<<i + (iInc * fd)<<"  "<< j + rd;
+        //std::cout<<"\n\n\nRange "<<i + (iInc * fd)<<"  "<< j + rd<<"\n\n\n";
         int tempIndex = getEnemyIndexAtPosition(i + (iInc * fd), j + rd);
         if(tempIndex > -1){
             if(!enemies.at(tempIndex)->takeDamage(this->getPlayer()->getLabel(), damage)){
@@ -1650,7 +1846,7 @@ void Game::playerAOE(Square effect, unsigned int damage, unsigned int range, int
             }
         }
     }else{
-        //std::cout<<"\n\n\n"<<i + rd<<"  "<< j + (jInc * fd);
+        //std::cout<<"\n\n\nRange "<<i + rd<<"  "<< j + (jInc * fd)<<"\n\n\n";
         int tempIndex = getEnemyIndexAtPosition(i + rd, j + (jInc * fd));
         if(tempIndex > -1){
             if(!enemies.at(tempIndex)->takeDamage(this->getPlayer()->getLabel(), damage)){
@@ -1693,7 +1889,7 @@ bool Game::playerOpen(char direction){
                 }else{
                     std::string choice;
                     while(true){
-                        std::cout<<"\nDo you want to use a key or perform an ability check? key/ability check\n";
+                        std::cout<<"\nDo you want to use a key or perform an ability check? key/ac\n";
                         getline(std::cin, choice);
 
                         if(areStringsEqual(choice, "key")){
@@ -1704,7 +1900,7 @@ bool Game::playerOpen(char direction){
                                 return true;
                             }
                             std::cout<<"\nYou don't have any keys.";
-                        }else if(areStringsEqual(choice, "ability check")){
+                        }else if(areStringsEqual(choice, "ac")){
                             int result = this->player->abilityCheck("str", 15);
                             if(result >= 0){
                                 history += "\n" + this->player->getLabel() + " opened a door.";
@@ -1727,7 +1923,7 @@ bool Game::playerOpen(char direction){
             if((**it).getY() == tempI && (**it).getX() == tempJ){
                 std::string choice;
                     while(true){
-                        std::cout<<"\nDo you want to use a key or perform an ability check? key/ability check\n";
+                        std::cout<<"\nDo you want to use a key or perform an ability check? key/ac\n";
                         getline(std::cin, choice);
 
                         if(areStringsEqual(choice, "key")){
@@ -1739,7 +1935,7 @@ bool Game::playerOpen(char direction){
                                 return true;
                             }
                             std::cout<<"\nYou don't have any keys.";
-                        }else if(areStringsEqual(choice, "ability check")){
+                        }else if(areStringsEqual(choice, "ac")){
                             int result = this->player->abilityCheck("dex", 15);
                             if(result >= 0){
                                 history += "\n" + this->player->getLabel() + " opened a chest.";
@@ -1765,6 +1961,7 @@ bool Game::playerOpen(char direction){
         std::cin.ignore();
         return false;
     }
+    return false;
 }
 
 bool Game::playerUse(unsigned int index){
@@ -2041,11 +2238,71 @@ void Game::printUnicode(std::string character, unsigned int color) const{
     std::cout << termcolor::reset;
 }
 
-void Game::printRange(std::vector<Square> areasOfEffect){
+void Game::printRange(std::vector<Square> areasOfEffect, unsigned int range, char direction){
+    std::vector<unsigned int> iCoordinates;
+    std::vector<unsigned int> jCoordinates;
+    //Fill the map with the necessary coordinates
+    int iInc = 0;
+    int jInc = 0;
+
+    if(tolower(direction) == 'w')
+        iInc = -1;
+    else if(tolower(direction) == 's')
+        iInc = 1;
+    else if(tolower(direction) == 'a')
+        jInc = -1;
+    else
+        jInc = 1;
+
+    unsigned int tempI = this->getPlayer()->getY();
+    unsigned int tempJ = this->getPlayer()->getX();
+    //Go to the origin point
+    for(int k = 0; k != range; k++){
+        tempI += iInc;
+        tempJ += jInc;
+        iCoordinates.push_back(tempI);
+        jCoordinates.push_back(tempJ);
+        if(getEnemyIndexAtPosition(tempI, tempJ) != -1)
+            break;
+    }
+    int i = tempI;
+    int j = tempJ;
+    int fd;
+    int rd;
+    std::vector<Square>::iterator it = areasOfEffect.begin();
+    std::vector<Square>::iterator end = areasOfEffect.end();
+    int counter = 0;
+    for(it; it != end; it ++){
+        fd = it->getFd();
+        rd = it->getRd();
+        if(iInc != 0){
+            //std::cout<<"\nCoordinate I "<<i + (iInc * fd)<<"  "<< j + rd;
+            iCoordinates.push_back(i + (iInc * fd));
+            jCoordinates.push_back(j + rd);
+            //coordinates.insert(std::pair<unsigned int, unsigned int>(i + (iInc * fd), j + rd));
+        }else{
+            //std::cout<<"\nCoordinate J "<<i + rd<<"   "<<j + (jInc * fd);
+            iCoordinates.push_back(i + rd);
+            jCoordinates.push_back(j + (jInc * fd));
+            //coordinates.insert(std::pair<unsigned int, unsigned int>(i + rd, j + (jInc * fd)));
+        }
+    }
+    //std::cout<<"\n\nSize: "<<coordinates.size()<<"Counter: "<<counter<<"\n\n";
+    //Print map
     int y = 0;
     for (int i = player->getY() - (MAP_HEIGHT/2); i != player->getY() + (MAP_HEIGHT/2) +1; i++) {
         y++;
 		for (int j = player->getX() - (MAP_WIDTH/2); j != player->getX() + (MAP_WIDTH/2) +1; j++) {
+            std::vector<unsigned int>::iterator itI = iCoordinates.begin();
+            std::vector<unsigned int>::iterator itJ = jCoordinates.begin();
+            std::vector<unsigned int>::iterator endI = iCoordinates.end();
+            
+            for(itI; itI != endI; itI ++, itJ ++){
+                if(*itI == i && *itJ == j){
+                    std::cout<<termcolor::on_cyan;
+                }
+            }
+
             if(j < 0 || i < 0 || j > MAX_MATRIX_WIDTH || i > MAX_MATRIX_HEIGHT){
                 std::cout<<" ";
             }else{
@@ -2144,75 +2401,11 @@ void Game::printRange(std::vector<Square> areasOfEffect){
                     printUnicode(chFog, 0);
                 }
             }
-                          
-		}
-        std::cout<<"   ";
-        switch (y){
-                case 1:
-                    std::cout<<"Name: "<<player->getLabel();
-                    break;
-                case 2:
-                    std::cout<<"Class: "<<player->getPlayerClass();
-                    break;
-                case 3:
-                    std::cout<<"Level: "<<player->getLvl();
-                    break;
-                case 4:
-                    std::cout<<"HP: "<<player->getHP()<<"/"<<player->getMaxHP();
-                    std::cout<<"    ";
-                    std::cout<<"MP: "<<player->getMP()<<"/"<<player->getMaxMP();
-                    break;
-                case 5:
-                    std::cout<<"STR: "<<player->getStr();
-                    std::cout<<"    ";
-                    std::cout<<"DEX: "<<player->getDex();
-                    std::cout<<"    ";
-                    std::cout<<"MND: "<<player->getMnd();
-                    std::cout<<"    ";
-                    std::cout<<"WIS: "<<player->getWis();
-                    break;
-                case 6:
-                    std::cout<<"ActTime: "<<player->getActTime();
-                    std::cout<<"    ";
-                    std::cout<<"MovTime: "<<player->getMovTime();
-                    std::cout<<"    ";
-                    std::cout<<"Res: "<<player->getRes();
-                    break;
-                case 7:
-                    std::cout<<"Exp: "<<player->getExp()<<"/"<<player->getLvl()*100;
-                    break;
-                case 8:
-                    std::cout<<"GP: "<<player->getGp();
-                    std::cout<<"    ";
-                    std::cout<<"Keys: "<<player->getKeys();
-                    break;
-                case 9:
-                    std::cout<<"LapsedTime: "<<lapsedTime;
-                    break;
-                case 11:
-                    std::cout<<"Inventory";
-                    break;
-            default:
-                if(y >= 12 && y <= 21){
-                    std::cout<<y-12;
-                    if(y-12 < player->getInventorySize()){
-                        if(player->getInventoryElementAt(y-12).getIsEquipped())
-                            std::cout<<" E : ";
-                        else
-                            std::cout<<"   : ";
-                        if(player->getInventoryElementAt(y-12).getIsIdentified())
-                            std::cout<<player->getInventoryElementAt(y-12).getLabel();
-                        else if(areStringsEqual(player->getInventoryElementAt(y-12).getType(), "herb"))
-                            std::cout<<"Unidentified herb";
-                        else
-                            std::cout<<"???";
-                    }else
-                        std::cout<<"   : ";
-                }
-                break;
-            }
+            std::cout<<termcolor::reset;
+        }
 		std::cout << std::endl;
 	}
+    system("pause");
 }
 
 void Game::checkBox(std::shared_ptr<Box> current, std::shared_ptr<Box> temp, std::vector<std::shared_ptr<Box>>& openList, std::vector<std::shared_ptr<Box>>& closedList, unsigned int targetX, unsigned int targetY){
@@ -2255,6 +2448,7 @@ void Game::checkBox(std::shared_ptr<Box> current, std::shared_ptr<Box> temp, std
 
 void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int targetY){
     bool found = false;
+    unsigned int counter = 0;
     //Create open list
     std::vector<std::shared_ptr<Box>> openList;
     //Create closed list
@@ -2263,7 +2457,7 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
     std::shared_ptr<Box> current = std::make_shared<Box> (Box(c.getX(), c.getY(), 0, 0));
     while(true){
         //TEMP INIZIO
-        /*for (int i = player->getY() - (MAP_HEIGHT/2); i != player->getY() + (MAP_HEIGHT/2) +1; i++) {
+        for (int i = player->getY() - (MAP_HEIGHT/2); i != player->getY() + (MAP_HEIGHT/2) +1; i++) {
             for (int j = player->getX() - (MAP_WIDTH/2); j != player->getX() + (MAP_WIDTH/2) +1; j++) {
                 if(j < 0 || i < 0 || j > MAX_MATRIX_WIDTH || i > MAX_MATRIX_HEIGHT){
                     std::cout<<" ";
@@ -2300,7 +2494,7 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
             }
             std::cout<<std::endl;
         }
-        */
+        
         //TEMP FINE
         //Add the walkable squares to the open list if necessary
         //Upper square
@@ -2308,11 +2502,14 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
         //std::cout<<"\n\nROSSO: "<<current->getX()<<"   "<<current->getY();
         //std::cout<<"\n\nCURRENT: "<<current->getX()<<"   "<<current->getY() - 1;
         //std::cout<<"\nTARGET: "<<targetX<<","<<targetY<<"\n\n";
+        counter ++;
+        std::cout<<"\nStar 1";
         if(current->getX() == targetX && current->getY() - 1 == targetY){
             found = true;
             //std::cout<<"eccolo";
             break;
         }
+        std::cout<<"\nStar 2";
         if(isWalkable(current->getX(), current->getY() - 1)){
             std::shared_ptr<Box> temp = std::make_shared<Box>(Box(current->getX(), current->getY() - 1, current->getG() + 1, getDistance(current->getX(), current->getY() - 1, targetX, targetY)));
             //Set previous box
@@ -2321,6 +2518,7 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
             
             checkBox(current, temp, openList, closedList, targetX, targetY);
         }
+        std::cout<<"\nStar 3";
         //Lower square
         //Check if the target is in the open list
         //std::cout<<"\n\nCURRENT: "<<current->getX()<<"   "<<current->getY() + 1;
@@ -2330,6 +2528,7 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
             //std::cout<<"eccolo";
             break;
         }
+        std::cout<<"\nStar 4";
         if(isWalkable(current->getX(), current->getY() + 1)){
             std::shared_ptr<Box> temp = std::make_shared<Box>(Box(current->getX(), current->getY() + 1, current->getG() + 1, getDistance(current->getX(), current->getY() + 1, targetX, targetY)));
             //Set previous box
@@ -2338,6 +2537,7 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
             //Check if the target is in the open list
             checkBox(current, temp, openList, closedList, targetX, targetY);
         }
+        std::cout<<"\nStar 5";
         //Right square
         //Check if the target is in the open list
         //std::cout<<"\n\nCURRENT: "<<current->getX() + 1<<"   "<<current->getY();
@@ -2347,6 +2547,7 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
             //std::cout<<"eccolo";
             break;
         }
+        std::cout<<"\nStar 6";
         if(isWalkable(current->getX() + 1, current->getY())){
             std::shared_ptr<Box> temp = std::make_shared<Box>(Box(current->getX() + 1, current->getY(), current->getG() + 1, getDistance(current->getX() + 1, current->getY(), targetX, targetY)));
             //Set previous box
@@ -2355,6 +2556,7 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
             //Check if the target is in the open list
             checkBox(current, temp, openList, closedList, targetX, targetY);
         }
+        std::cout<<"\nStar 7";
         //Left square
         //Check if the target is in the open list
         //std::cout<<"\n\nCURRENT: "<<current->getX() - 1<<"   "<<current->getY();
@@ -2364,6 +2566,7 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
             //std::cout<<"eccolo";
             break;
         }
+        std::cout<<"\nStar 8";
         if(isWalkable(current->getX() - 1, current->getY())){
             std::shared_ptr<Box> temp = std::make_shared<Box>(Box(current->getX() - 1, current->getY(), current->getG() + 1, getDistance(current->getX() - 1, current->getY(), targetX, targetY)));
             //Set previous box
@@ -2371,7 +2574,7 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
             //Check if the target is in the open list
             checkBox(current, temp, openList, closedList, targetX, targetY);
         }
-
+        std::cout<<"\nStar 9";
         //Find the box with the lower F score
         std::vector<std::shared_ptr<Box>>::iterator it = openList.begin();
         std::vector<std::shared_ptr<Box>>::iterator end = openList.end();
@@ -2392,23 +2595,35 @@ void Game::walkShortestPath(Character& c, unsigned int targetX, unsigned int tar
                 }
             }
         }
+        std::cout<<"\nStar 10";
         if(openList.size() == 0)
             break;
+        std::cout<<"\nStar 11";
         //Add the box with the lower F score to the closed list
         closedList.push_back(std::make_shared<Box>(Box(openList.at(minIndex)->getX(), openList.at(minIndex)->getY(), openList.at(minIndex)->getG(), openList.at(minIndex)->getH())));
+        std::cout<<"\nStar 12";
         closedList.back()->setPreviousBox(openList.at(minIndex)->getPreviousBox());
         //Set the current box
+        std::cout<<"\nStar 13";
         current = closedList.back();
+        std::cout<<"\nStar 14";
         //Remove the current box from the open list
         openList.erase(openList.begin() + minIndex);
+        std::cout<<"\nStar 15";
+        if(counter > 150)
+            break;
+        std::cout<<"\nStar 16";
     }
-
+    std::cout<<"\nCounter: "<<counter;
     //If the path has been found...
     if(found){
-        //Iterate backwards to find where it started
-        std::shared_ptr<Box> p = current->getPreviousBox();
-        while(p->getPreviousBox()->getPreviousBox() != nullptr){
+        std::shared_ptr<Box> p = current;
+        if(counter > 2){
             p = p->getPreviousBox();
+            //Iterate backwards to find where it started
+            while(p->getPreviousBox()->getPreviousBox() != nullptr){
+                p = p->getPreviousBox();
+            }
         }
         c.setCoordinates(p->getX(), p->getY());
     }else{

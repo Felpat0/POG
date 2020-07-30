@@ -119,16 +119,18 @@ class Game{
     void initMap();
     void exportMap();
     void printInterface();
+    void printMatrix();
     bool isWalkable(int x, int y); //Use only after generation
     bool isWalkableForPlayer(int x, int y); //Use only after generation
     int getElementType(int i, int j);
     void addRoom(std::unique_ptr<Room>& room);
     void addRoom(int id, std::string chWall, std::string chFloor);
     int isColliding(Room& room1, Room& room2);
-    bool linkRooms();
+    void linkRooms();
     bool createPath(Room& room1, Room& room2, int& doorsCounter);
-    bool linkRoomsByDoors();
-    bool createPathByDoors(Door& door1, Door& door2, int roomId);
+    void linkRoomsByDoors();
+    void createPathByDoors(Door& door1, Door& door2, int roomId);
+    void clearUnusedDoors();
 
     void chooseClass();
     void clearFog();
@@ -151,7 +153,7 @@ class Game{
     void getItems();
 
     void printUnicode(std::string character, unsigned int color) const;
-    void printRange(std::vector<Square> areasOfEffect);
+    void printRange(std::vector<Square> areasOfEffect, unsigned int range, char direction);
 
     void checkBox(std::shared_ptr<Box> current, std::shared_ptr<Box> temp, std::vector<std::shared_ptr<Box>>& openList, std::vector<std::shared_ptr<Box>>& closedList, unsigned int targetX, unsigned int targetY);
     void walkShortestPath(Character& c, unsigned int targetX, unsigned int targetY);

@@ -14,9 +14,9 @@
         <baseStats hpMax="16" mpMax="10" str="1" dex="3" mnd="2" wis="5" res="2" movT="1" actT="2" />
         <levelUpStats hpMax="2" mpMax="2" str="0.3" dex="0.3" mnd="0.8" wis="1" res="0.5" movT="-0.05" actT="-0.05" />
         <startingEquipment>
-            <weapon label="Dagger" />
             <scroll label="Magic Missle" />
-            <potion label="Healing Potion" />
+            <scroll label="Healing Word" />
+            <potion label="Mana Potion" />
         </startingEquipment>
     </heroClass>
 
@@ -24,7 +24,7 @@
         <baseStats hpMax="16" mpMax="0" str="2" dex="4" mnd="1" wis="2" res="2" movT="1" actT="2" />
         <levelUpStats hpMax="2" mpMax="1" str="0.5" dex="1" mnd="0.3" wis="0.5" res="0.6" movT="-0.075" actT="-0.075" />
         <startingEquipment>
-            <weapon label="Longsword" />
+            <weapon label="Dagger" />
             <protection label="Leather Armor" />
             <potion label="Healing Potion" />
         </startingEquipment>

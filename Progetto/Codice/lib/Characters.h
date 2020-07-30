@@ -124,6 +124,8 @@ class Player : public Character{
     std::vector<Square> getScrollAOEAt(unsigned int index);
     std::vector<SelfEffect> getScrollSelfEffectsAt(unsigned int index);
     
+    void applySelfEffect(SelfEffect e);
+    void applyEffect(Effect e);
 };
 
 
@@ -135,23 +137,26 @@ class Enemy : public Character{
     unsigned int exp;
     unsigned int gp;
     std::string attackStat;
+    bool hasAttackedLastTurn;
     
     public:
-
     Enemy(unsigned int x, unsigned int y, unsigned int maxHP, float str, 
     float dex, float mnd, float wis, float res, 
     float movTime, float actTime, std::string attackStat, unsigned int attackRange, 
     unsigned int sightRange, unsigned int exp, unsigned int gp, std::string label, std::string ch);
     Enemy(const Enemy& e, unsigned int x, unsigned int y);
 
-    float getNextActTime() const;
     void setNextActTime(float nextActTime);
+    void setHasAttackedLastTurn(bool hasAttackedLastTurn);
+
+    float getNextActTime() const;
     std::string getAttackStat() const;
     unsigned int getAttackRange() const;
     unsigned int getSightRange() const;
     unsigned int getExp() const;
     unsigned int getGp() const;
     unsigned int getAtkDamage();
+    bool getHasAttackedLastTurn() const;
 };
 
 #endif
